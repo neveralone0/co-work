@@ -190,8 +190,3 @@ class GetSpecificDayReservationsAPI(APIView):
         reservations = Reservation.objects.filter(reservation_time=date)
         srz_data = ReserveSerializer(instance=reservations, many=True)
         return Response(srz_data.data)
-#
-# {
-#     '2022-2-34': '7',
-#     '2022-2-35': '8',
-# }

@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'django_celery_beat',
+    'drf_spectacular'
 ]
 
 MIDDLEWARE = [
@@ -142,6 +143,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # REST API JWT CONF
@@ -151,4 +153,12 @@ SIMPLE_JWT_ = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ACCESS_TOKEN_LIFE_TIME': timedelta(days=10),
     'ROTATE_REFRESH_TOKENS': True,
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'makeen co-work',
+    'DESCRIPTION': 'co-work api docs',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
