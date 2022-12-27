@@ -10,6 +10,7 @@ from accounting.permissions import IsNotBanned
 
 class GetDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsNotBanned]
+    serializer_class =  DeskSerializer
 
     def get(self, request):
         desk_list = Desk.objects.all()
@@ -19,6 +20,7 @@ class GetDeskAPI(APIView):
 
 class CreateDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = DeskSerializer
 
     def post(self, request):
         srz_data = DeskSerializer(data=request.data)
@@ -49,6 +51,7 @@ class DeskListDeleteAPI(APIView):
 
 
 class GetSpecificDeskAPI(APIView):
+    serializer_class = DeskSerializer
 
     def get(self, desk_id):
         desk = Desk.objects.get(pk=desk_id)
@@ -58,6 +61,7 @@ class GetSpecificDeskAPI(APIView):
 
 class FreeDesksListAPI(APIView):
     permission_classes = [IsNotBanned, ]
+    serializer_class = DeskSerializer
 
     def get(self, request):
         desks = Desk.objects.filter(reserved=False)
@@ -67,6 +71,7 @@ class FreeDesksListAPI(APIView):
 
 class ReserveDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsNotBanned]
+    serializer_class = ReserveSerializer
 
     def post(self, request):
         reserve_check = {
@@ -100,6 +105,7 @@ class CancelReservationAPI(APIView):
 
 class CurrentUserReservationsAPI(APIView):
     permission_classes = [IsAuthenticated, ]
+    serializer_class = DeskSerializer
 
     def get(self, request):
         reservation_obj = Reservation.objects.filter(user__in=request.user)
@@ -109,6 +115,7 @@ class CurrentUserReservationsAPI(APIView):
 
 class GetAllReservesAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ReserveSerializer
 
     def get(self, request):
         reserves = Reservation.objects.all()
@@ -163,6 +170,7 @@ class ChangeAllDesksPriceAPI(APIView):
 
 class AdminReserveDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ReserveSerializer
 
     def post(self, request):
         srz_data = ReserveSerializer(data=request.data)
@@ -184,6 +192,7 @@ class AdminCancelReservationAPI(APIView):
 
 class GetSpecificDayReservationsAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ReserveSerializer
 
     def post(self, request):
         date = request.data['date']

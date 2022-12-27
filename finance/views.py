@@ -82,6 +82,8 @@ class OrderVerifyAPI(APIView):
 
 
 class CouponApplyAPI(APIView):
+    serializer_class = CouponSerializer
+
     def post(self, request, order_id):
         now = datetime.datetime.now()
         srz_data = CouponSerializer(instance=request.POST)
