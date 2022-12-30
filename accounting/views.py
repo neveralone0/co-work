@@ -15,11 +15,14 @@ from accounting.permissions import IsAdminOrReadOnly
 
 
 class GetUserViaPhoneAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
     def get(self, request):
-        phone = request.data['phone_number']
+        try:
+            phone = request.data['phone_number']
+        except:
+            return Response({'msg': 'phone number is empty'}, status=status.HTTP_400_BAD_REQUEST)
         user = User.objects.get(phone_number=phone)
         srz_data = UserSerializer(instance=user)
         return Response(srz_data.data)
