@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -160,3 +161,5 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'cowork api docs',
     'VERSION': '1.0.0',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
