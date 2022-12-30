@@ -110,7 +110,7 @@ class LogoutView(APIView):
 
 
 class RegisterUser(APIView):
-    serializer_class =  UserRegisterSerializer
+    serializer_class = UserRegisterSerializer
 
     def post(self, request):
         print(request.data)
@@ -161,7 +161,7 @@ class UnbanUserAPI(APIView):
 
 class CurrentlyBannedUsersAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class =  BanSerializer
+    serializer_class = BanSerializer
 
     def post(self, request):
         banned_users = Ban.objects.filter(status=True)
@@ -181,7 +181,7 @@ class CurrentUserBanHistoryAPI(APIView):
 
 class CurrentUserBanStatusAPI(APIView):
     permission_classes = [IsAuthenticated, ]
-    permission_classes = BanSerializer
+    serializer_class = BanSerializer
 
     def get(self, request):
         ban_status = Ban.objects.filter(user=request.user.id, status=True).exists()

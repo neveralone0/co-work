@@ -156,9 +156,7 @@ SIMPLE_JWT_ = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'makeen co-work',
-    'DESCRIPTION': 'co-work api docs',
+    'TITLE': 'cowork',
+    'DESCRIPTION': 'cowork api docs',
     'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
 }
