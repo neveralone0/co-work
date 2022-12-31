@@ -8,12 +8,12 @@ app_name = 'accounting'
 urlpatterns = [
     # path('user-role/', views.UserRoleAPI.as_view()),
     path('register/', views.RegisterUser.as_view()),
-    path('login/', views.UserLoginAPI.as_view()),
+    path('request-for-code/', views.SendOTPCodeAPI.as_view()),
+    path('verify-otp-code/', views.VerifyOtpCodeAPI.as_view()),
+    path('login/', views.VerifyOtpCodeAPI.as_view()),
     path('remove-user/<int:user_id>/', views.RemoveUserAPI.as_view()),
 
-    path('reset-password/', views.ResetPasswordAPI.as_view()),
-    path('send-otp-code/', views.SendOTPCodeAPI.as_view()),
-    path('verify-otp-code/', views.VerifyOtpCodeAPI.as_view()),
+    # path('reset-password/', views.ResetPasswordAPI.as_view()),
 
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

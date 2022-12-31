@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-from .models import Ban
+from .models import Ban, User
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -20,4 +20,14 @@ class IsNotBanned(BasePermission):
         if not ban:
             return True
 
+        return False
+
+
+class PhoneVerified(BasePermission):
+    message = 'phone is not verified'
+
+    def has_permission(self, request, view):
+        user = User.objects.filter(phone_number=request.data['phone_number']).exists()
+        if user.phone_number_validation:
+            return True
         return False

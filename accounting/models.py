@@ -7,13 +7,12 @@ from accounting import managers
 
 class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True, null=False)
-    password = models.CharField(max_length=32)
+    phone_number_validation = models.BooleanField(default=False)
     national_code = models.IntegerField(unique=True)
     user_code = models.IntegerField(null=True, blank=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    last_name = models.CharField(max_length=32, null=True, blank=True)
-    first_name = models.CharField(max_length=32, null=True, blank=True)
+    full_name = models.CharField(max_length=32, null=True, blank=True)
     birth_date = models.DateTimeField(null=True, blank=True)
     picture = models.ImageField(null=True, blank=True)
 
@@ -80,9 +79,9 @@ class Ban(models.Model):
 
 
 class OtpCode(models.Model):
-    phone_number = models.CharField(max_length=11)
+    phone_number = models.CharField(max_length=20)
     code = models.PositiveSmallIntegerField()
     created = models.DateTimeField(auto_now=True)
 
-    def str(self):
+    def __str__(self):
         return f'{self.phone_number} - {self.code} - {self.created}'

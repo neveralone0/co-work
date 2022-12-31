@@ -4,11 +4,8 @@ from accounting.models import User, Ban
 
 
 class UserRegisterSerializer(serializers.Serializer):
-    # national_code = serializers.IntegerField()
     phone_number = serializers.CharField(required=True, write_only=True)
-    password = serializers.CharField(required=True, write_only=True)
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
+    full_name = serializers.CharField()
     # user_code = serializers.CharField()
     birth_date = serializers.DateTimeField(required=False)
     picture = serializers.ImageField(required=False)

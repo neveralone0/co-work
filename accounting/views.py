@@ -1,4 +1,5 @@
 import random
+
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
@@ -7,11 +8,94 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User, Ban, OtpCode
 from utils import send_otp_code
 from accounting.serializers import UserRegisterSerializer, UserSerializer, BanSerializer
 from accounting.permissions import IsAdminOrReadOnly
+
+
+class RegisterUser(APIView):
+    serializer_class = UserRegisterSerializer
+
+    def post(self, request):
+        srz_data = UserRegisterSerializer(data=request.data, partial=True)
+        if srz_data.is_valid():
+            phone_number = srz_data.validated_data['phone_number']
+            if not phone_number.isdigit():
+                return Response({'msg': 'phone number must be all num!'})
+            if not self.check_for_user(phone_number):
+                return Response({'msg': 'user exists, use otp code and login!'}, status=status.HTTP_400_BAD_REQUEST)
+            if SendOTPCodeAPI.check_for_existing_code(self, phone_number):
+                return Response({'msg': 'wait 2 minutes'}, status=status.HTTP_400_BAD_REQUEST)
+            srz_data.create(srz_data.validated_data)
+            SendOTPCodeAPI.create_otp_code(self, phone_number=phone_number)
+            return Response({'msg': 'otp sent'}, status=status.HTTP_201_CREATED)
+        return Response(srz_data.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def check_for_user(self, phone_number):
+        check_for_user = User.objects.filter(phone_number=phone_number).exists()
+        if check_for_user:
+            return False
+        return True
+
+
+class SendOTPCodeAPI(APIView):
+    def post(self, request):
+        phone_number = request.data['phone_number']
+        if not RegisterUser.check_for_user(phone_number):
+            return Response({'msg': 'user does not exists please register'}, status=status.HTTP_400_BAD_REQUEST)
+        if self.check_for_existing_code(phone_number):
+            return Response({'msg': 'wait 2 minutes'}, status=status.HTTP_400_BAD_REQUEST)
+        self.create_otp_code(phone_number)
+        return Response({'msg': 'code sent'})
+
+    def check_for_existing_code(self, phone_number):
+        check_for_code = OtpCode.objects.filter(phone_number=phone_number).exists()
+        if check_for_code:
+            return True
+        return False
+
+    def create_otp_code(self, phone_number):
+        code = random.randint(1111, 9999)
+        print('=otp============')
+        print(code)
+        # send_otp_code(phone_number, code)
+        if not phone_number.isdigit():
+            return Response({'msg': 'phone number must be all num!'})
+
+        OtpCode.objects.create(phone_number=phone_number, code=code)
+        return Response({'msg': 'code sent'})
+
+
+class VerifyOtpCodeAPI(APIView):
+    def post(self, request):
+        phone_number = request.data['phone_number']
+        code = request.data['code']
+        if RegisterUser.check_for_user(self, phone_number):
+            return Response({'msg': 'user does not exists please register'}, status=status.HTTP_400_BAD_REQUEST)
+        code_var = OtpCode.objects.get(phone_number=phone_number, code=code)
+        if not code_var:
+            return Response({'msg': 'code is wrong or expired!'}, status=status.HTTP_400_BAD_REQUEST)
+        if code_var.code == int(code):
+            self.verify_user(request)
+            TokenObtainPairView()
+            return Response({'msg': 'verified, logged in successfully'})
+
+    def verify_user(self, request):
+        user = User.objects.get(phone_number=request.data['phone_number'])
+        if not user.phone_number_validation:
+            user.phone_number_validation = True
+            user.save()
+        return Response({})
+
+    # def login_via_password(self, request):
+    #     phone_number = User.objects.get(phone_number=request.data['phone_number'])
+    #     password = request.data['password']
+    #     if not check_password(password, phone_number.password):
+    #         return Response({'msg': 'wrong password'}, status=status.HTTP_400_BAD_REQUEST)
+    #     login(request, phone_number)
+    #     return Response({'message': 'logged in', 'phone': phone_number.phone_number})
 
 
 class GetUserViaPhoneAPI(APIView):
@@ -29,25 +113,13 @@ class GetUserViaPhoneAPI(APIView):
 
 
 class GetUsersListAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
     def get(self, request):
         users = User.objects.all()
         srz_data = UserSerializer(instance=users, many=True)
         return Response(srz_data.data)
-
-
-class UserLoginAPI(APIView):
-    permission_classes = [AllowAny, ]
-
-    def post(self, request):
-        phone_number = User.objects.get(phone_number=request.data['phone_number'])
-        password = request.data['password']
-        if not check_password(password, phone_number.password):
-            return Response({'msg': 'wrong password'}, status=status.HTTP_400_BAD_REQUEST)
-        login(request, phone_number)
-        return Response({'message': 'logged in', 'phone': phone_number.phone_number})
 
 
 class ResetPasswordAPI(APIView):
@@ -62,29 +134,6 @@ class ResetPasswordAPI(APIView):
         user.set_password(request.data['new_password'])
         user.save()
         return Response({'message': 'ok'}, status=status.HTTP_200_OK)
-
-
-class SendOTPCodeAPI(APIView):
-    def post(self, request):
-        phone_number = request.data['phone_number']
-        check_for_user = User.objects.filter(phone_number=phone_number).exists()
-        if not check_for_user:
-            return Response({'msg': 'user not found!'})
-        # check_for_code = OtpCode.objects.filter(phone_number=phone_number).exists()
-        # if check_for_code:
-            # return Response({'msg': 'wait 2 minutes!'})
-        code = random.randint(1111, 9999)
-        send_otp_code(phone_number, code)
-        OtpCode.objects.create(phone_number=phone_number, code=code)
-        return Response({'msg': 'code sent'})
-
-
-class VerifyOtpCodeAPI(APIView):
-    def post(self, request):
-        code = OtpCode.objects.filter(phone_number=request.data['phone_number'])
-        if request.data['code'] == code:
-            return Response({'msg': 'code is correct'})
-        return Response({'msg': 'wrong code!'})
 
 
 class RemoveUserAPI(APIView):
@@ -110,29 +159,6 @@ class LogoutView(APIView):
 
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class RegisterUser(APIView):
-    serializer_class = UserRegisterSerializer
-
-    def post(self, request):
-        print(request.data)
-        # request.POST['national_code'] = int(request.POST['national_code'])
-        srz_data = UserRegisterSerializer(data=request.data, partial=True)
-        if srz_data.is_valid():
-            # print('=1==========')
-            # print(srz_data)
-            # print('=2==========')
-            # print(srz_data.data)
-            # print('=3==========')
-            # print(srz_data.validated_data)
-            # print('lets create')
-            # srz_data.validated_data['national_code'] = int(srz_data.validated_data['national_code'])
-            srz_data.create(srz_data.validated_data)
-            return Response({'msg': 'success'}, status=status.HTTP_201_CREATED)
-        print('=e=================')
-        print(srz_data.errors)
-        return Response(srz_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BanUserAPI(APIView):
