@@ -20,3 +20,8 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class DayIncome(models.Model):
+    date = models.DateTimeField(auto_now=True)
+    income = models.IntegerField()

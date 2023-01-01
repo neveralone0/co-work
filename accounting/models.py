@@ -14,7 +14,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     full_name = models.CharField(max_length=32, null=True, blank=True)
     birth_date = models.DateTimeField(null=True, blank=True)
-    picture = models.ImageField(null=True, blank=True)
+    picture = models.ImageField(null=True, blank=True, upload_to='profiles/%Y/%m/')
 
     objects = managers.UserManager()
 
