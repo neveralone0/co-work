@@ -8,8 +8,8 @@ app_name = 'accounting'
 urlpatterns = [
     # path('user-role/', views.UserRoleAPI.as_view()),
     path('register/', views.RegisterUser.as_view()),
-    path('request-for-code/', views.SendOTPCodeAPI.as_view()),
-    path('verify-otp-code/', views.VerifyOtpCodeAPI.as_view()),
+    path('request-code/', views.SendOTPCodeAPI.as_view()),
+    path('verify-code/', views.VerifyOtpCodeAPI.as_view()),
     path('login/', views.VerifyOtpCodeAPI.as_view()),
     path('remove-user/<int:user_id>/', views.RemoveUserAPI.as_view()),
 
