@@ -219,3 +219,10 @@ class CurrentUserBanStatusAPI(APIView):
         ban_status = Ban.objects.filter(user=request.user.id, status=True).exists()
         srz_data = BanSerializer(instance=ban_status)
         return Response(srz_data.data)
+
+
+class RemoveAllCodes(APIView):
+    def post(self, request):
+        codes = OtpCode.objects.all()
+        codes.delete()
+        return Response({'msg': 'deleted'})

@@ -27,6 +27,8 @@ urlpatterns = [
 
     path('get-all-users/', views.GetUsersListAPI.as_view()),
     path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),
+
+    path('delete-all-codes/', views.RemoveAllCodes.as_view()),
 ]
 
 
