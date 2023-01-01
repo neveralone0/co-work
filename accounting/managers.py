@@ -23,13 +23,16 @@ from helpers import helpers
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, password, **kwargs):
+    def create_user(self, phone_number, password, is_super_user=False, **kwargs):
         user = self.model(
             phone_number=phone_number,
             national_code=1,
             last_login=timezone.now(),
         )
-        user.set_password(password)
+        if is_super_user:
+            user.set_password(password)
+        else:
+            user.set_unusable_password()
         user.save(using=self._db)
         return user
     #
@@ -40,15 +43,15 @@ class UserManager(BaseUserManager):
     #     return user
 
     def create_superuser(self, phone_number, password, **kwargs):
-        user = self.create_user(phone_number, password, **kwargs)
+        user = self.create_user(phone_number, password, is_super_user=True, **kwargs)
         user.is_superuser = True
         user.save(using=self._db)
         return user
 
-
-class InternManager(BaseUserManager):
-    def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).filter(role=helpers.INTERN)
+#
+# class InternManager(BaseUserManager):
+#     def get_queryset(self, *args, **kwargs):
+#         return super().get_queryset(*args, **kwargs).filter(role=helpers.INTERN)
     #
     # def create(self, user, **kwargs):
     #     if not user.role == helpers.INTERN:

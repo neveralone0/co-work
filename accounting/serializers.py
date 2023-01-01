@@ -3,6 +3,16 @@ from rest_framework import serializers
 from accounting.models import User, Ban
 
 
+class MiniUserRegisterSerializer(serializers.Serializer):
+    phone_number = serializers.CharField(required=True, write_only=True)
+
+    def create(self, data):
+        # data['national_code'] = data['uni_code']
+        # del(data['uni_code'])
+        user_obj = User.objects.create(**data)
+        return user_obj
+
+
 class UserRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, write_only=True)
     full_name = serializers.CharField()

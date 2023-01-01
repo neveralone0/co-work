@@ -11,21 +11,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User, Ban, OtpCode
 from utils import send_otp_code
-from accounting.serializers import UserRegisterSerializer, UserSerializer, BanSerializer
+from accounting.serializers import UserRegisterSerializer, UserSerializer, BanSerializer, MiniUserRegisterSerializer
 from accounting.permissions import IsAdminOrReadOnly
 
 
 class RegisterUser(APIView):
-    serializer_class = UserRegisterSerializer
+    serializer_class = MiniUserRegisterSerializer
 
     def post(self, request):
-        srz_data = UserRegisterSerializer(data=request.data, partial=True)
+        srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
             phone_number = srz_data.validated_data['phone_number']
             if not phone_number.isdigit():
                 return Response({'msg': 'phone number must be all num!'})
-            if not self.check_for_user(phone_number):
-                return Response({'msg': 'user exists, use otp code and login!'}, status=status.HTTP_400_BAD_REQUEST)
+            # if not self.check_for_user(phone_number):
+                # return Response({'msg': 'user exists, use otp code and login!'}, status=status.HTTP_400_BAD_REQUEST)
             if SendOTPCodeAPI.check_for_existing_code(self, phone_number):
                 return Response({'msg': 'wait 2 minutes'}, status=status.HTTP_400_BAD_REQUEST)
             srz_data.create(srz_data.validated_data)
@@ -79,8 +79,11 @@ class VerifyOtpCodeAPI(APIView):
             return Response({'msg': 'code is wrong or expired!'}, status=status.HTTP_400_BAD_REQUEST)
         if code_var.code == int(code):
             self.verify_user(request)
-            TokenObtainPairView()
-            return Response({'msg': 'verified, logged in successfully'})
+            user = User.objects.get(phone_number=phone_number)
+            refresh = RefreshToken.for_user(user)
+            return Response({'msg': 'verified, logged in successfully',
+                             'refresh': str(refresh),
+                             'access': str(refresh.access_token)})
 
     def verify_user(self, request):
         user = User.objects.get(phone_number=request.data['phone_number'])
