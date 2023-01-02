@@ -4,10 +4,12 @@ from accounting.models import User, Ban
 
 class MiniUserRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, write_only=True)
+    uni_code = serializers.IntegerField()
+    working_category = serializers.CharField()
 
     def create(self, data):
-        # data['national_code'] = data['uni_code']
-        # del(data['uni_code'])
+        data['national_code'] = data['uni_code']
+        del(data['uni_code'])
         user_obj = User.objects.create(**data)
         return user_obj
 
@@ -15,10 +17,10 @@ class MiniUserRegisterSerializer(serializers.Serializer):
 class UserRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, write_only=True)
     full_name = serializers.CharField()
-    # user_code = serializers.CharField()
     birth_date = serializers.DateTimeField(required=False)
     picture = serializers.ImageField(required=False)
     uni_code = serializers.IntegerField()
+    working_category = serializers.CharField()
 
     def validate_national_code(self, value):
         # user national code validation here!

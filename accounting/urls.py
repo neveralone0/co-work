@@ -12,6 +12,9 @@ urlpatterns = [
     path('verify-code/', views.VerifyOtpCodeAPI.as_view()),
     # path('login/', views.VerifyOtpCodeAPI.as_view()),
     path('remove-user/<int:user_id>/', views.RemoveUserAPI.as_view()),
+    path('update-user-info/', views.UpdateUserInfo.as_view()),
+
+    path('get-working-category/', views.GetWorkingCategory.as_view()),
 
     # path('reset-password/', views.ResetPasswordAPI.as_view()),
 

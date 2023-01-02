@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 
-from helpers import helpers
+from helpers.helpers import WORKING_CATEGORY
 from accounting import managers
 
 
@@ -9,12 +9,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True, null=False)
     phone_number_validation = models.BooleanField(default=False)
     national_code = models.IntegerField(unique=True, null=True, blank=True)
-    # user_code = models.IntegerField(null=True, blank=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     full_name = models.CharField(max_length=32, null=True, blank=True)
     birth_date = models.DateTimeField(null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to='profiles/%Y/%m/')
+    working_category = models.CharField(choices=WORKING_CATEGORY, max_length=128, default='other')
 
     objects = managers.UserManager()
 

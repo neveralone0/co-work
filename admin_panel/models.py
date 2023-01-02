@@ -10,9 +10,9 @@ class Cards(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     # lis = models.ForeignKey(to='Li',on_delete=models.SET_DEFAULT, default='')
-    li1 = models.CharField(max_length=128)
-    li2 = models.CharField(max_length=128)
-    li3 = models.CharField(max_length=128)
+    li1 = models.CharField(max_length=128, null=True, blank=True)
+    li2 = models.CharField(max_length=128, null=True, blank=True)
+    li3 = models.CharField(max_length=128, null=True, blank=True)
 
 #
 # class Li(models.Model):
