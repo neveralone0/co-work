@@ -159,9 +159,9 @@ REST_FRAMEWORK = {
 # REST API JWT CONF
 from django.utils.timezone import timedelta
 
-SIMPLE_JWT_ = {
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
+SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFE_TIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ROTATE_REFRESH_TOKENS': True,
 }
 

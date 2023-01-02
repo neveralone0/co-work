@@ -109,6 +109,9 @@ class VerifyOtpCodeAPI(APIView):
             self.verify_user(request)
             user = User.objects.get(phone_number=phone_number)
             refresh = RefreshToken.for_user(user)
+            try:
+                code_var.delete()
+            except: pass
             return Response({'msg': 'verified, logged in successfully',
                              'refresh': str(refresh),
                              'access': str(refresh.access_token)})
