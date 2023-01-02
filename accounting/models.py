@@ -14,7 +14,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField(max_length=32, null=True, blank=True)
     birth_date = models.DateTimeField(null=True, blank=True)
     picture = models.ImageField(null=True, blank=True, upload_to='profiles/%Y/%m/')
-    working_category = models.CharField(choices=WORKING_CATEGORY, max_length=128, default='other')
+    working_category = models.CharField(null=True, blank=True, choices=WORKING_CATEGORY, max_length=128, default='other')
 
     objects = managers.UserManager()
 

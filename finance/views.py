@@ -29,7 +29,7 @@ class PayOrderAPI(APIView):
             "amount": bill.price,
             "callback_url": CallbackURL,
             "description": description,
-            "metadata": {"mobile": request.user.phone_number}
+            "metadata": {"mobile": request.user.phone_number, "email": "a@b.com"}
         }
         req_header = {"accept": "application/json",
                       "content-type": "application/json'"}

@@ -1,5 +1,4 @@
 import random
-
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
@@ -56,6 +55,10 @@ class RegisterUser(APIView):
 
 
 class SendOTPCodeAPI(APIView):
+    '''
+    body:
+    phone_number(str)
+    '''
     def post(self, request):
         phone_number = request.data['phone_number']
         # if not RegisterUser.check_for_user(phone_number):
@@ -109,9 +112,9 @@ class VerifyOtpCodeAPI(APIView):
             self.verify_user(request)
             user = User.objects.get(phone_number=phone_number)
             refresh = RefreshToken.for_user(user)
-            try:
-                code_var.delete()
-            except: pass
+            # try:
+            #     code_var.delete()
+            # except: pass
             return Response({'msg': 'verified, logged in successfully',
                              'refresh': str(refresh),
                              'access': str(refresh.access_token)})

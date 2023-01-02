@@ -1,4 +1,8 @@
+from rest_framework.decorators import action
 from rest_framework.views import APIView, Response, status
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
+from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
 from .serializers import *
 from .models import *
 
@@ -21,6 +25,37 @@ class UploadImage(APIView):
             srz_data.save()
             return Response({'msg': 'image uploaded'}, status=status.HTTP_201_CREATED)
         return Response({srz_data.errors})
+
+
+class ImageViewSet(viewsets.ModelViewSet):
+    serializer_class = ImageSerializer
+    queryset = Images.objects.all()
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = [AllowAny, ]
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+    @action(detail=True, methods=['put'])
+    def createe(self, request):
+        serializer = ImageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'msg': 'ok'})
+
+
+class UploadImage(APIView):
+    parser_classes = [FileUploadParser, ]
+
+    def post(self, request):
+        file = request.data.get['file', None]
+        import pdb; pdb.set_trace()
+        print(file)
+        if file:
+            return Response({'msg':'ok'})
+        return Response({'msg':'not ok'})
+
+
 
 
 class DeleteImage(APIView):
