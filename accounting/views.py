@@ -95,15 +95,12 @@ class VerifyOtpCodeAPI(APIView):
     def post(self, request):
         phone_number = request.data['phone_number']
         code = request.data['code']
-        # if RegisterUser.check_for_user(self, phone_number):
-            # return Response({'msg': 'user does not exists please register'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             check_for_user = User.objects.get(phone_number=phone_number)
             if not check_for_user:
                 return Response({'msg': 'register first!'}, status=status.HTTP_400_BAD_REQUEST)
         except:
             pass
-
         try:
             code_var = OtpCode.objects.get(phone_number=phone_number, code=code)
         except:
