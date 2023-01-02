@@ -5,11 +5,11 @@ app_name = 'cowork'
 
 urlpatterns = [
     path('get-desks/', views.GetDeskAPI.as_view()),
-    path('get-desk/<int:desk_ip>/', views.GetSpecificDeskAPI.as_view()),
+    path('get-desk/<int:desk_id>/', views.GetSpecificDeskAPI.as_view()),
 
     path('create-desk/', views.CreateDeskAPI.as_view()),
 
-    path('delete-desk/<int:pk>/', views.DeleteDeskAPI.as_view()),
+    path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),
     path('delete-desks/', views.DeskListDeleteAPI.as_view()),
 
     path('free-desks/', views.FreeDesksListAPI.as_view()),
