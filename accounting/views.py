@@ -5,13 +5,13 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView, Response
-from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, status
+from rest_framework.decorators import action
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .models import User, Ban, OtpCode
+from .models import User, OtpCode
 from utils import send_otp_code
-from accounting.serializers import UserRegisterSerializer, UserSerializer, BanSerializer, MiniUserRegisterSerializer
+from accounting.serializers import UserRegisterSerializer, UserSerializer, MiniUserRegisterSerializer
 from accounting.permissions import IsAdminOrReadOnly, IsNotBanned
 from helpers.helpers import WORKING_CATEGORY
 
@@ -56,6 +56,7 @@ class RegisterUser(APIView):
 
 
 class SendOTPCodeAPI(APIView):
+
     def post(self, request):
         phone_number = request.data['phone_number']
         # if not RegisterUser.check_for_user(phone_number):
@@ -141,6 +142,7 @@ class UpdateUserInfo(viewsets.ModelViewSet):
         queryset = User.objects.get(phone_number=user)
         return queryset
 
+    @action(detail=True, methods=['PUT'])
     def perform_update(self, serializer):
         serializer.save()
 
@@ -223,63 +225,6 @@ class LogoutView(APIView):
 
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class BanUserAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = BanSerializer
-
-    def post(self, request):
-        srz_data = BanSerializer(data=request.data)
-        if srz_data.is_valid():
-            user = request.user.id
-            user = get_object_or_404(User, pk=user)
-            user = user.banns.objects.filter(status=True).exists()
-            if user:
-                return Response({'msg': 'user already banned!'}, status=status.HTTP_400_BAD_REQUEST)
-            srz_data.save()
-            return Response({'msg': 'user banned'})
-
-
-class UnbanUserAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        ban_objects = Ban.objects.filter(user=request.user.id, status=True)
-        for obj in ban_objects:
-            obj.status = False
-            obj.save()
-        return Response({'msg': 'user unbanned!'})
-
-
-class CurrentlyBannedUsersAPI(APIView):
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = BanSerializer
-
-    def post(self, request):
-        banned_users = Ban.objects.filter(status=True)
-        srz_data = BanSerializer(instance=banned_users, many=True)
-        return Response(srz_data.data)
-
-
-class CurrentUserBanHistoryAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
-    serializer_class = BanSerializer
-
-    def get(self, request):
-        ban_history = Ban.objects.filter(user=request.user.id)
-        srz_data = BanSerializer(instance=ban_history, many=True)
-        return Response(srz_data.data)
-
-
-class CurrentUserBanStatusAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
-    serializer_class = BanSerializer
-
-    def get(self, request):
-        ban_status = Ban.objects.filter(user=request.user.id, status=True).exists()
-        srz_data = BanSerializer(instance=ban_status)
-        return Response(srz_data.data)
 
 
 class RemoveAllCodes(APIView):

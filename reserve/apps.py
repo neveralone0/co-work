@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class CoworkConfig(AppConfig):
+class ReserveConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'cowork'
+    name = 'reserve'

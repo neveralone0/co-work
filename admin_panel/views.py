@@ -1,8 +1,10 @@
 from rest_framework.decorators import action
 from rest_framework.views import APIView, Response, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework import viewsets
+from reserve.models import Reservation, Desk
+from reserve.serializers import ReserveSerializer, DeskSerializer
 from .serializers import *
 from .models import *
 
@@ -151,3 +153,181 @@ class MyModelViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         print('saved')
         serializer.save()
+
+
+class BanUserAPI(APIView):
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = BanSerializer
+
+    def post(self, request):
+        srz_data = BanSerializer(data=request.data)
+        print('-1')
+        if srz_data.is_valid():
+            user = request.data['user']
+            print('0')
+            try:
+                print('1')
+                check = User.objects.filter(bans__status=True, id=user).exists()
+                if check:
+                    print('okk')
+                    return Response({'msg': 'user already banned!'}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                print(e)
+                return Response({'msg': 'user not found!'}, status=status.HTTP_400_BAD_REQUEST)
+            print('3')
+            srz_data.create(validated_data=srz_data.validated_data)
+            print('6')
+            return Response({'msg': 'user banned'})
+        print('============')
+        print(srz_data.errors)
+
+
+class UnbanUserAPI(APIView):
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        user = request.data['user']
+        ban_objects = Ban.objects.filter(user=user, status=True)
+        for obj in ban_objects:
+            obj.status = False
+            obj.save()
+        return Response({'msg': 'user unbanned!'})
+
+
+class CurrentlyBannedUsersAPI(APIView):
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = BanSerializer
+
+    def post(self, request):
+        banned_users = Ban.objects.filter(status=True)
+        srz_data = BanSerializer(instance=banned_users, many=True)
+        return Response(srz_data.data)
+
+
+class UserBanHistoryAPI(APIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = BanSerializer
+
+    def get(self, request):
+        user = request.data['user']
+        ban_history = Ban.objects.filter(user=user)
+        srz_data = BanSerializer(instance=ban_history, many=True)
+        return Response(srz_data.data)
+
+
+class UserBanStatusAPI(APIView):
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = BanSerializer
+
+    def get(self, request):
+        user = request.data['user']
+        ban_status = Ban.objects.filter(user=user, status=True).exists()
+        if ban_status:
+            return Response({'mas': 'user is banned'})
+        return Response({'mas': 'user is not banned'})
+
+
+
+class CreateDeskAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = DeskSerializer
+
+    def post(self, request):
+        srz_data = DeskSerializer(data=request.data)
+        if srz_data.is_valid():
+            srz_data.save()
+            return Response(srz_data.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class DeleteDeskAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def delete(self, request, pk):
+        desk = Desk.objects.filter(pk=pk)
+        desk.delete()
+        return Response({'msg': 'deleted'})
+
+
+class DeskListDeleteAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def delete(self, request):
+        desk_ids = request.data['desks']
+        desks = Desk.objects.filter(id__in=desk_ids)
+        for desk in desks:
+            desk.delete()
+        return Response({'msg': 'desks deleted'})
+
+
+class GetAllReservesAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ReserveSerializer
+
+    def get(self, request):
+        reserves = Reservation.objects.all()
+        srz_data = ReserveSerializer(instance=reserves, many=True)
+        return Response(srz_data.data)
+
+
+class ChangeDeskPriceAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        desk_obj = get_object_or_404(Desk, id=request.data['desk_id'])
+        desk_obj.price = request.data['price']
+        desk_obj.save()
+
+
+
+class GetThisWeekReservesAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        pass
+
+
+
+class ChangeMultiDesksPriceAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        desk_list = Desk.objects.filter(id__in=request.data['desk_list'])
+        price = request.data['price']
+        for desk in desk_list:
+            desk.price = price
+            desk.save()
+
+
+class ChangeAllDesksPriceAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        desk_list = Desk.objects.all()
+        price = request.data['price']
+        for desk in desk_list:
+            desk.price = price
+            desk.save()
+
+
+class AdminReserveDeskAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = ReserveSerializer
+
+    def post(self, request):
+        srz_data = ReserveSerializer(data=request.data)
+        if srz_data.is_valid():
+            srz_data.save()
+            return Response(srz_data.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminCancelReservationAPI(APIView):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def post(self, request):
+        reserve_id = request.data['reserve_id']
+        reserve_obj = Reservation.objects.filter(id=reserve_id).exists()
+        reserve_obj.delete()
+        return Response({'msg': 'object deleted'})
+

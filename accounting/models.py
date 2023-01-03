@@ -28,10 +28,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return self.is_superuser
 
-    @property
-    def is_admin(self):
-        return self.role == helpers.ADMIN
-
+    # @property
+    # def is_admin(self):
+    #     return self.role == helpers.ADMIN
+    #
 
 # class InternProfile(models.Model):
 #     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -70,12 +70,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 # class EducationInfo(models.Model):
 #     pass
 
-
-class Ban(models.Model):
-    user = models.OneToOneField(to=User, on_delete=models.DO_NOTHING, related_name='bans')
-    end = models.DateTimeField()
-    status = models.BooleanField(default=True)
-    reason = models.CharField(max_length=255)
 
 
 class OtpCode(models.Model):

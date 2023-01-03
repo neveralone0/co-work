@@ -29,12 +29,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/logout/', views.LogoutView.as_view(), name='auth_logout'),
 
-    path('ban-user/', views.BanUserAPI.as_view()),
-    path('unban-user/', views.UnbanUserAPI.as_view()),
-    path('current-banns/', views.CurrentlyBannedUsersAPI.as_view()),
-    path('user-ban-history/', views.CurrentUserBanHistoryAPI.as_view()),
-    path('user-ban-status/', views.CurrentUserBanStatusAPI.as_view()),
-
     path('get-all-users/', views.GetUsersListAPI.as_view()),
     path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),
 

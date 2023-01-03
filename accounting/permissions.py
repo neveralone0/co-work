@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
-from .models import Ban, User
+from admin_panel.models import Ban
+from .models import User
 
 
 class IsAdminOrReadOnly(BasePermission):

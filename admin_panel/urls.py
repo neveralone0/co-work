@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('imageee', views.MyModelViewSet, basename='imageee')
+router.register('image', views.MyModelViewSet, basename='imageee')
 
 app_name = 'admin'
 
@@ -20,11 +20,26 @@ urlpatterns = [
     path('contactus-update/', views.ContactUsUpdate.as_view()),
 
     path('card/', views.CardAPI.as_view()),
-    # path('card/', views.CardAPI.as_view()),
 
-    # path('add-li/', views.AddLi.as_view()),
-    # path('update-li/<int:pk>', views.UpdateLi.as_view()),
-    # path('delete-li/<int:pk>', views.DeleteLi.as_view()),
+    path('ban-user/', views.BanUserAPI.as_view()),
+    path('unban-user/', views.UnbanUserAPI.as_view()),
+    path('current-bans/', views.CurrentlyBannedUsersAPI.as_view()),
+    path('user-ban-history/', views.UserBanHistoryAPI.as_view()),
+    path('user-ban-status/', views.UserBanStatusAPI.as_view()),
+
+    path('create-desk/', views.CreateDeskAPI.as_view()),
+    path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),
+    path('delete-desks/', views.DeskListDeleteAPI.as_view()),
+
+    path('change-desk-price/', views.ChangeDeskPriceAPI.as_view()),
+    path('change-multidesk-price/', views.ChangeMultiDesksPriceAPI.as_view()),
+    path('change-alldesks-price/', views.ChangeAllDesksPriceAPI.as_view()),
+
+    path('admin-reserve/', views.AdminReserveDeskAPI.as_view()),
+    path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
+
+    path('all-reservations/', views.GetAllReservesAPI.as_view()),
+
 ]
 
 # urlpatterns += router.urls

@@ -30,10 +30,9 @@
 # admin.site.register(User, UserAdmin)
 
 from django.contrib import admin
-from accounting.models import User, Ban, OtpCode
+from accounting.models import User, OtpCode
 
 
 admin.site.register(User)
-admin.site.register(Ban)
 admin.site.register(OtpCode)
 

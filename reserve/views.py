@@ -18,38 +18,6 @@ class GetDeskAPI(APIView):
         return Response(srz_data.data)
 
 
-class CreateDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DeskSerializer
-
-    def post(self, request):
-        srz_data = DeskSerializer(data=request.data)
-        if srz_data.is_valid():
-            srz_data.save()
-            return Response(srz_data.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class DeleteDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def delete(self, request, pk):
-        desk = Desk.objects.filter(pk=pk)
-        desk.delete()
-        return Response({'msg': 'deleted'})
-
-
-class DeskListDeleteAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def delete(self, request):
-        desk_ids = request.data['desks']
-        desks = Desk.objects.filter(id__in=desk_ids)
-        for desk in desks:
-            desk.delete()
-        return Response({'msg': 'desks deleted'})
-
-
 class GetSpecificDeskAPI(APIView):
     serializer_class = DeskSerializer
 
@@ -113,81 +81,12 @@ class CurrentUserReservationsAPI(APIView):
         return Response(srz_data.data)
 
 
-class GetAllReservesAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = ReserveSerializer
-
-    def get(self, request):
-        reserves = Reservation.objects.all()
-        srz_data = ReserveSerializer(instance=reserves, many=True)
-        return Response(srz_data.data)
-
 
 class GetTodayReservesAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         pass
-
-
-class GetThisWeekReservesAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        pass
-
-
-class ChangeDeskPriceAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        desk_obj = get_object_or_404(Desk, id=request.data['desk_id'])
-        desk_obj.price = request.data['price']
-        desk_obj.save()
-
-
-class ChangeMultiDesksPriceAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        desk_list = Desk.objects.filter(id__in=request.data['desk_list'])
-        price = request.data['price']
-        for desk in desk_list:
-            desk.price = price
-            desk.save()
-
-
-class ChangeAllDesksPriceAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        desk_list = Desk.objects.all()
-        price = request.data['price']
-        for desk in desk_list:
-            desk.price = price
-            desk.save()
-
-
-class AdminReserveDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = ReserveSerializer
-
-    def post(self, request):
-        srz_data = ReserveSerializer(data=request.data)
-        if srz_data.is_valid():
-            srz_data.save()
-            return Response(srz_data.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class AdminCancelReservationAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        reserve_id = request.data['reserve_id']
-        reserve_obj = Reservation.objects.filter(id=reserve_id).exists()
-        reserve_obj.delete()
-        return Response({'msg': 'object deleted'})
 
 
 class GetSpecificDayReservationsAPI(APIView):

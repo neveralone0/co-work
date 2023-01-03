@@ -40,9 +40,9 @@ INSTALLED_APPS = [
 
     # apps
     'accounting.apps.AccountingConfig',
-    'cowork.apps.CoworkConfig',
     'finance.apps.FinanceConfig',
     'admin_panel.apps.AdminPanelConfig',
+    'reserve.apps.ReserveConfig',
 
     # third-party apps
     'rest_framework',

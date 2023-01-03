@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounting.models import User, Ban
+from accounting.models import User
 
 
 class MiniUserRegisterSerializer(serializers.Serializer):
@@ -53,10 +53,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
-
-
-class BanSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Ban
         fields = '__all__'
