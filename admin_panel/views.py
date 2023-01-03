@@ -1,7 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework.views import APIView, Response, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
@@ -46,16 +46,20 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 class UploadImage(APIView):
     parser_classes = [FileUploadParser, ]
+    serializer_classes = ImageSerializer
 
     def post(self, request):
-        file = request.data.get['file', None]
+        file = request.data.get('file', None)
+        # Images.objects.create(img=file)
         import pdb; pdb.set_trace()
-        print(file)
+        # print(file)
         if file:
-            return Response({'msg':'ok'})
-        return Response({'msg':'not ok'})
+            return Response({'msg': 'ok'})
+        return Response({'msg': 'not ok'})
 
-
+class UploadImage1(APIView):
+    def post(self, request):
+        pass
 
 
 class DeleteImage(APIView):
@@ -137,3 +141,13 @@ class CardAPI(APIView):
 #         li.delete()
 #         return Response({'msg': 'li deleted'})
 
+
+class MyModelViewSet(viewsets.ModelViewSet):
+    queryset = Images.objects.all()
+    serializer_class = ImageSerializer
+    parser_classes = (MultiPartParser, FormParser)
+    # permission_classes = [IsAuthenticated, ]
+
+    def perform_create(self, serializer):
+        print('saved')
+        serializer.save()

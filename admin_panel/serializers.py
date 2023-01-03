@@ -20,7 +20,18 @@ class CardSerializer(serializers.ModelSerializer):
 #         fields = '__all__'
 
 
+# class ImageSerializer(serializers.ModelSerializer):
+#     img = serializers.ImageField(max_length=None, use_url=True)
+#     class Meta:
+#         model = Images
+#         fields = '__all__'
+
 class ImageSerializer(serializers.ModelSerializer):
+
+    # creator = serializers.ReadOnlyField(source='creator.username')
+    # creator_id = serializers.ReadOnlyField(source='creator.id')
+    img = serializers.ImageField()
+
     class Meta:
         model = Images
         fields = '__all__'

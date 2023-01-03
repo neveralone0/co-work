@@ -7,6 +7,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView, Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import viewsets
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User, Ban, OtpCode
 from utils import send_otp_code
@@ -55,10 +56,6 @@ class RegisterUser(APIView):
 
 
 class SendOTPCodeAPI(APIView):
-    '''
-    body:
-    phone_number(str)
-    '''
     def post(self, request):
         phone_number = request.data['phone_number']
         # if not RegisterUser.check_for_user(phone_number):
@@ -135,17 +132,25 @@ class VerifyOtpCodeAPI(APIView):
     #     return Response({'message': 'logged in', 'phone': phone_number.phone_number})
 
 
-class UpdateUserInfo(APIView):
+class UpdateUserInfo(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsNotBanned]
 
-    def post(self, request):
-        user = request.user.phone_number
-        user = User.objects.get(phone_number=user)
-        srz_data = self.serializer_class(data=request.data, instance=user, partial=True)
-        if srz_data.is_valid():
-            return Response({'message': 'updated'})
+    def get_queryset(self):
+        user = self.request.user.phone_number
+        queryset = User.objects.get(phone_number=user)
+        return queryset
 
+    def perform_update(self, serializer):
+        serializer.save()
+
+    # def post(self, request):
+    #     user = request.user.phone_number
+    #     user = User.objects.get(phone_number=user)
+    #     srz_data = self.serializer_class(data=request.data, instance=user, partial=True)
+    #     if srz_data.is_valid():
+    #         return Response({'message': 'updated'})
+    #
 
 class GetWorkingCategory(APIView):
     def get(self, request):

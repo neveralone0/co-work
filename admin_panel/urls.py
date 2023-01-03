@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('imageee', views.ImageViewSet, basename='imageee')
+router.register('imageee', views.MyModelViewSet, basename='imageee')
 
 app_name = 'admin'
 

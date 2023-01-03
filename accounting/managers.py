@@ -23,10 +23,10 @@ from helpers import helpers
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, password, is_super_user=False, **kwargs):
+    def create_user(self, phone_number, national_code, password, is_super_user=False, **kwargs):
         user = self.model(
             phone_number=phone_number,
-            national_code=1,
+            national_code=national_code,
             last_login=timezone.now(),
         )
         if is_super_user:

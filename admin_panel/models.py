@@ -2,8 +2,12 @@ from django.db import models
 from core.settings import BASE_DIR
 
 
+def upload_to(instance, filename):
+    return '{filename}'.format(filename=filename)
+
+
 class Images(models.Model):
-    img = models.ImageField(upload_to=BASE_DIR / 'static/%Y/%m/')
+    img = models.ImageField(upload_to=upload_to)
 
 
 class Cards(models.Model):

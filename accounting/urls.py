@@ -1,16 +1,23 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from accounting import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework.routers import DefaultRouter
+
+
+router = DefaultRouter()
+router.register('update-user-info', views.UpdateUserInfo, basename='update-user-info')
+
 
 app_name = 'accounting'
 urlpatterns = [
+    path('', include(router.urls)),
     # path('user-role/', views.UserRoleAPI.as_view()),
     path('register/', views.RegisterUser.as_view()),
     path('request-code/', views.SendOTPCodeAPI.as_view()),
     path('verify-code/', views.VerifyOtpCodeAPI.as_view()),
-    path('update-user-info/', views.UpdateUserInfo.as_view()),
+    # path('update-user-info/', views.UpdateUserInfo.as_view()),
     # path('login/', views.VerifyOtpCodeAPI.as_view()),
     path('remove-user/<int:user_id>/', views.RemoveUserAPI.as_view()),
 
