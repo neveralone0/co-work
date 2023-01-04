@@ -4,12 +4,8 @@ from accounting.models import User
 
 class MiniUserRegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=True, write_only=True)
-    uni_code = serializers.IntegerField(required=False)
-    working_category = serializers.CharField(required=False)
-
+    
     def create(self, data):
-        data['national_code'] = data['uni_code']
-        del(data['uni_code'])
         user_obj = User.objects.create(**data)
         return user_obj
 
