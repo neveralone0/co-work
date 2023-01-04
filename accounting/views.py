@@ -99,6 +99,14 @@ class SendOTPCodeAPI(APIView):
 
 
 class VerifyOtpCodeAPI(APIView):
+    
+    '''
+    body{
+    phone_number = string
+    code = int
+    } 
+    '''
+    
     def post(self, request):
         phone_number = request.data['phone_number']
         code = request.data['code']
