@@ -57,6 +57,12 @@ class RegisterUser(APIView):
 
 class SendOTPCodeAPI(APIView):
 
+    '''
+    body{
+    phone_number = string
+    } 
+    '''
+    
     def post(self, request):
         phone_number = request.data['phone_number']
         # if not RegisterUser.check_for_user(phone_number):
