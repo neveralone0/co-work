@@ -5,7 +5,6 @@ from accounting.models import User
 class Desk(models.Model):
     active = models.BooleanField(default=True)
     price = models.PositiveIntegerField()
-    owner = models.ForeignKey(to=User, on_delete=models.DO_NOTHING)  # creator of desk
     id = models.IntegerField(unique=True, primary_key=True)
 
 

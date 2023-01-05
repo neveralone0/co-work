@@ -37,31 +37,13 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
-
-    @action(detail=True, methods=['put'])
-    def createe(self, request):
-        serializer = ImageSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({'msg': 'ok'})
-
-
-class UploadImage(APIView):
-    parser_classes = [FileUploadParser, ]
-    serializer_classes = ImageSerializer
-
-    def post(self, request):
-        file = request.data.get('file', None)
-        # Images.objects.create(img=file)
-        import pdb; pdb.set_trace()
-        # print(file)
-        if file:
-            return Response({'msg': 'ok'})
-        return Response({'msg': 'not ok'})
-
-class UploadImage1(APIView):
-    def post(self, request):
-        pass
+    #
+    # def createe(self, request):
+    #     serializer = ImageSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response({'msg': 'ok'})
+    #
 
 
 class DeleteImage(APIView):
@@ -75,7 +57,7 @@ class DeleteImage(APIView):
 class ListDeleteImages(APIView):
     def delete(self, request):
         ids = request.data['ids']
-        imgs = Images.objects.filter(id=ids)
+        imgs = Images.objects.filter(id__in=ids)
         for img in imgs:
             img.delete()
         return Response({'msg': 'deleted'})
@@ -227,7 +209,6 @@ class UserBanStatusAPI(APIView):
         return Response({'mas': 'user is not banned'})
 
 
-
 class CreateDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = DeskSerializer
@@ -236,7 +217,7 @@ class CreateDeskAPI(APIView):
         srz_data = DeskSerializer(data=request.data)
         if srz_data.is_valid():
             srz_data.save()
-            return Response(srz_data.data)
+            return Response({'msg': 'created'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -245,7 +226,7 @@ class DeleteDeskAPI(APIView):
 
     def delete(self, request, pk):
         desk = Desk.objects.filter(pk=pk)
-        desk.delete()
+        desk[0].delete()
         return Response({'msg': 'deleted'})
 
 

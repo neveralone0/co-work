@@ -4,7 +4,7 @@ from accounting.models import User
 
 
 def upload_to(instance, filename):
-    return '{filename}'.format(filename=filename)
+    return '/site{filename}'.format(filename=filename)
 
 
 class Images(models.Model):

@@ -1,13 +1,10 @@
 import random
-from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.views import APIView, Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import viewsets, generics, status
-from rest_framework.decorators import action
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User, OtpCode
 from utils import send_otp_code
@@ -56,12 +53,11 @@ class RegisterUser(APIView):
 
 
 class SendOTPCodeAPI(APIView):
-
-    '''
+    """
     body{
     phone_number = string
-    } 
-    '''
+    }
+    """
     
     def post(self, request):
         phone_number = request.data['phone_number']
@@ -99,13 +95,12 @@ class SendOTPCodeAPI(APIView):
 
 
 class VerifyOtpCodeAPI(APIView):
-    
-    '''
+    """
     body{
-    phone_number = string
-    code = int
-    } 
-    '''
+    phone_number: string\n
+    code: int
+    }
+    """
     
     def post(self, request):
         phone_number = request.data['phone_number']
@@ -150,15 +145,25 @@ class VerifyOtpCodeAPI(APIView):
 class UpdateUserInfo(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsNotBanned]
+    parser_classes = [JSONParser, MultiPartParser]
 
     def get_queryset(self):
         user = self.request.user.phone_number
         queryset = User.objects.get(phone_number=user)
         return queryset
 
-    @action(detail=True, methods=['PUT'])
-    def perform_update(self, serializer):
-        serializer.save()
+    def update(self, request, *args, **kwargs):
+        partial = True
+        instance = self.get_object()
+        serializer = self.get_serializer()
+        serializer.is_valid(raise_excpection=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+    # # @action(detail=True, methods=['PUT'])
+    # def perform_update(self, serializer, pk):
+    #     serializer.save()
 
     # def post(self, request):
     #     user = request.user.phone_number
@@ -167,6 +172,18 @@ class UpdateUserInfo(viewsets.ModelViewSet):
     #     if srz_data.is_valid():
     #         return Response({'message': 'updated'})
     #
+
+
+class TempUpdateUser(APIView):
+    def post(self, request):
+        user = request.user.phone_number
+        user = User.objects.get(phone_number=user)
+        srz_data = self.serializer_class(data=request.data, instance=user, partial=True)
+        if srz_data.is_valid():
+            return Response({'message': 'updated'})
+
+
+
 
 class GetWorkingCategory(APIView):
     def get(self, request):

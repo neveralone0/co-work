@@ -5,19 +5,25 @@ from accounting import views
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.routers import DefaultRouter
 
+update_user = views.UpdateUserInfo.as_view({
+    'patch': 'partial_update'
+})
 
 router = DefaultRouter()
-router.register('update-user-info', views.UpdateUserInfo, basename='update-user-info')
+router.register(r'update', views.UpdateUserInfo, basename="update")
+# router.register('update-user-info', views.UpdateUserInfo, basename='update-user-info')
+# router.register('update-user-info/<int:pk>/', views.UpdateUserInfo, basename='update-user-info')
 
 
 app_name = 'accounting'
 urlpatterns = [
     path('', include(router.urls)),
+    # path('update/<int:pk>/', update_user),
     # path('user-role/', views.UserRoleAPI.as_view()),
     path('register/', views.RegisterUser.as_view()),
     path('request-code/', views.SendOTPCodeAPI.as_view()),
     path('verify-code/', views.VerifyOtpCodeAPI.as_view()),
-    # path('update-user-info/', views.UpdateUserInfo.as_view()),
+    path('update-user-info/', views.TempUpdateUser.as_view()),
     # path('login/', views.VerifyOtpCodeAPI.as_view()),
     path('remove-user/<int:user_id>/', views.RemoveUserAPI.as_view()),
 

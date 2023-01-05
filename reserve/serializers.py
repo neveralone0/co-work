@@ -3,6 +3,7 @@ from .models import Desk, Reservation
 
 
 class DeskSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Desk
         fields = '__all__'

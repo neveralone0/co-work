@@ -12,7 +12,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('get-all-images/', views.GetAllImage.as_view()),
     path('upload-image/', views.UploadImage.as_view()),
-    # path('upload-image/', views.ImageViewSet.as_view()),
     path('delete-image/', views.DeleteImage.as_view()),
     path('list-delete-image/', views.ListDeleteImages.as_view()),
 

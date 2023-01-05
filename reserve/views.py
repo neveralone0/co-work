@@ -9,7 +9,7 @@ from accounting.permissions import IsNotBanned
 
 
 class GetDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsNotBanned]
+    # permission_classes = [IsAuthenticated, IsNotBanned]
     serializer_class = DeskSerializer
 
     def get(self, request):
