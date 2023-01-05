@@ -144,13 +144,14 @@ class VerifyOtpCodeAPI(APIView):
 
 class UpdateUserInfo(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsNotBanned]
+    # permission_classes = [IsAuthenticated, IsNotBanned]
     parser_classes = [JSONParser, MultiPartParser]
 
     def get_queryset(self):
-        user = self.request.user.phone_number
-        queryset = User.objects.get(phone_number=user)
-        return queryset
+        # user = self.request.user.phone_number
+        # user = '09111140'
+        q = User.objects.get(phone_number='09111140')
+        return q
 
     def update(self, request, *args, **kwargs):
         partial = True
@@ -160,6 +161,11 @@ class UpdateUserInfo(viewsets.ModelViewSet):
         self.perform_update(serializer)
 
         return Response(serializer.data)
+
+
+class Weired(APIView):
+    def post(self):
+        srz_data = UserRegisterSerializer
 
     # # @action(detail=True, methods=['PUT'])
     # def perform_update(self, serializer, pk):
@@ -175,11 +181,17 @@ class UpdateUserInfo(viewsets.ModelViewSet):
 
 
 class TempUpdateUser(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserRegisterSerializer
+
     def post(self, request):
         user = request.user.phone_number
         user = User.objects.get(phone_number=user)
-        srz_data = self.serializer_class(data=request.data, instance=user, partial=True)
+        srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
+            srz_data.validated_data['national_code'] = srz_data.validated_data['uni_code']
+            del(srz_data.validated_data['uni_code'])
+            srz_data.update(instance=user, validated_data=srz_data.validated_data)
             return Response({'message': 'updated'})
 
 

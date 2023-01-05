@@ -10,7 +10,7 @@ update_user = views.UpdateUserInfo.as_view({
 })
 
 router = DefaultRouter()
-router.register(r'update', views.UpdateUserInfo, basename="update")
+router.register(r'update/<int:pk>', views.UpdateUserInfo, basename="update")
 # router.register('update-user-info', views.UpdateUserInfo, basename='update-user-info')
 # router.register('update-user-info/<int:pk>/', views.UpdateUserInfo, basename='update-user-info')
 

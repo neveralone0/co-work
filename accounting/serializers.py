@@ -10,13 +10,13 @@ class MiniUserRegisterSerializer(serializers.Serializer):
         return user_obj
 
 
-class UserRegisterSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(required=True, write_only=True)
-    full_name = serializers.CharField()
+class UserRegisterSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(required=False, write_only=True)
+    full_name = serializers.CharField(required=False)
     birth_date = serializers.DateTimeField(required=False)
     picture = serializers.ImageField(required=False)
-    uni_code = serializers.IntegerField()
-    working_category = serializers.CharField()
+    uni_code = serializers.IntegerField(required=False)
+    working_category = serializers.CharField(required=False)
 
     def validate_national_code(self, value):
         # user national code validation here!
@@ -35,6 +35,10 @@ class UserRegisterSerializer(serializers.Serializer):
         user_obj = User.objects.create(**data)
 
         return user_obj
+
+    class Meta:
+        model = User
+        fields = '__all__'
 
 
 # class UserRegisterSerializer(serializers.ModelSerializer):
