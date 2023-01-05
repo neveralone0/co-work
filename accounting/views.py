@@ -1,3 +1,4 @@
+import os.path
 import random
 from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -191,10 +192,11 @@ class TempUpdateUser(APIView):
         if srz_data.is_valid():
             srz_data.validated_data['national_code'] = srz_data.validated_data['uni_code']
             del(srz_data.validated_data['uni_code'])
+            img_path = user.profile.path
+            if os.path.exists(img_path):
+                os.remove(img_path)
             srz_data.update(instance=user, validated_data=srz_data.validated_data)
             return Response({'message': 'updated'})
-
-
 
 
 class GetWorkingCategory(APIView):
@@ -208,15 +210,20 @@ class GetWorkingCategory(APIView):
 
 
 class GetUserViaPhoneAPI(APIView):
+    """
+    body{
+    phone_number: string
+    }
+    """
     # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
     def get(self, request):
+        phone = request.data['phone_number']
         try:
-            phone = request.data['phone_number']
+            user = User.objects.get(phone_number=phone)
         except:
-            return Response({'msg': 'phone number is empty'}, status=status.HTTP_400_BAD_REQUEST)
-        user = User.objects.get(phone_number=phone)
+            return Response({'msg': 'user does not exists'})
         srz_data = UserSerializer(instance=user)
         return Response(srz_data.data)
 
