@@ -385,3 +385,23 @@ class GetUsersListAPI(APIView):
         # srz_data = UserSerializer(instance=filter.qs, many=True)
         payload = Paginate.page(self, request, filter.qs, self.serializer_class)
         return Response(payload)
+
+
+class GetQuotes(APIView):
+    serializer_class = QuoteSerializer
+
+    def get(self, request):
+        quotes = Quotes.objects.all()
+        srz_data = self.serializer_class(instance=quotes, many=True)
+        return Response(srz_data.data)
+
+
+class UpdateQuotes(APIView):
+    serializer_class = QuoteSerializer
+
+    def post(self, request):
+        srz_data = self.serializer_class(data=request.data)
+        if srz_data.is_valid():
+            quote = Quotes.objects.get(id=request.data['id'])
+            srz_data.update(quote)
+            return Response({'msg': 'updated'})

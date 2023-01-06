@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cards, Images, ContactUs, Ban
+from .models import Cards, Images, ContactUs, Ban, Quotes
 
 
 class CardSerializer(serializers.ModelSerializer):
@@ -46,4 +46,10 @@ class ContactUsSerializer(serializers.ModelSerializer):
 class BanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ban
+        fields = '__all__'
+
+
+class QuoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quotes
         fields = '__all__'

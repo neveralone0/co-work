@@ -41,3 +41,8 @@ class Ban(models.Model):
     end = models.DateTimeField(auto_now=True)
     status = models.BooleanField(default=True)
     reason = models.CharField(max_length=255)
+
+
+class Quotes(models.Model):
+    title = models.CharField(max_length=64, null=True, blank=True)
+    body = models.CharField(max_length=256, null=True, blank=True)
