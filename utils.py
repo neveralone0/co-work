@@ -1,4 +1,7 @@
 from kavenegar import *
+import django_filters
+from django_filters import DateFilter, TimeFilter, CharFilter, NumberFilter
+from accounting.models import User
 
 
 def send_otp_code(phone_number, code):
@@ -17,3 +20,10 @@ def send_otp_code(phone_number, code):
         print('=2=========')
         print(e)
     pass
+
+
+class UserFilter(django_filters.FilterSet):
+    class Meta:
+        model = User
+        fields = ('phone_number', 'national_code', 'full_name', 'join_date', 'working_category')
+

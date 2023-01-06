@@ -12,6 +12,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     full_name = models.CharField(max_length=32, null=True, blank=True)
+    join_date = models.DateTimeField(null=True, blank=True)
     birth_date = models.DateTimeField(null=True, blank=True)
     profile = models.ImageField(null=True, blank=True, upload_to='profiles/%Y/%m/')
     working_category = models.CharField(null=True, blank=True, choices=WORKING_CATEGORY, max_length=128, default='other')

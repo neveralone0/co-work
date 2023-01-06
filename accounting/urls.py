@@ -35,9 +35,6 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/logout/', views.LogoutView.as_view(), name='auth_logout'),
 
-    path('get-all-users/', views.GetUsersListAPI.as_view()),
-    path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),
-
     path('delete-all-codes/', views.RemoveAllCodes.as_view()),
 ]
 

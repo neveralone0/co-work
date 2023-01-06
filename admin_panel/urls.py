@@ -25,6 +25,7 @@ urlpatterns = [
     path('current-bans/', views.CurrentlyBannedUsersAPI.as_view()),
     path('user-ban-history/', views.UserBanHistoryAPI.as_view()),
     path('user-ban-status/', views.UserBanStatusAPI.as_view()),
+    path('ban-history/', views.BanHistoryAPI.as_view()),
 
     path('create-desk/', views.CreateDeskAPI.as_view()),
     path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),
@@ -39,6 +40,10 @@ urlpatterns = [
 
     path('all-reservations/', views.GetAllReservesAPI.as_view()),
 
+    # path('paginator/', views.Paginate.as_view()),
+
+    path('get-all-users/', views.GetUsersListAPI.as_view()),
+    path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),
 ]
 
 # urlpatterns += router.urls

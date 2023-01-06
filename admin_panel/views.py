@@ -1,11 +1,15 @@
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 from rest_framework.decorators import action
 from rest_framework.views import APIView, Response, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework import viewsets
+from accounting.serializers import UserSerializer
 from reserve.models import Reservation, Desk
 from reserve.serializers import ReserveSerializer, DeskSerializer
 from .serializers import *
+from utils import UserFilter
 from .models import *
 
 
@@ -182,8 +186,9 @@ class CurrentlyBannedUsersAPI(APIView):
 
     def post(self, request):
         banned_users = Ban.objects.filter(status=True)
-        srz_data = BanSerializer(instance=banned_users, many=True)
-        return Response(srz_data.data)
+        # srz_data = BanSerializer(instance=banned_users, many=True)
+        payload = Paginate.page(self, request, banned_users, self.serializer_class)
+        return Response(payload)
 
 
 class UserBanHistoryAPI(APIView):
@@ -193,8 +198,9 @@ class UserBanHistoryAPI(APIView):
     def get(self, request):
         user = request.data['user']
         ban_history = Ban.objects.filter(user=user)
-        srz_data = BanSerializer(instance=ban_history, many=True)
-        return Response(srz_data.data)
+        # srz_data = BanSerializer(instance=ban_history, many=True)
+        payload = Paginate.page(self, request, ban_history, self.serializer_class)
+        return Response(payload)
 
 
 class UserBanStatusAPI(APIView):
@@ -207,6 +213,15 @@ class UserBanStatusAPI(APIView):
         if ban_status:
             return Response({'mas': 'user is banned'})
         return Response({'mas': 'user is not banned'})
+
+
+class BanHistoryAPI(APIView):
+    serializer_class = Ban
+
+    def post(self, request):
+        ban = Ban.objects.all()
+        payload = Paginate.page(self, request, ban, self.serializer_class)
+        return Response(payload)
 
 
 class CreateDeskAPI(APIView):
@@ -247,18 +262,23 @@ class GetAllReservesAPI(APIView):
 
     def get(self, request):
         reserves = Reservation.objects.all()
-        srz_data = ReserveSerializer(instance=reserves, many=True)
-        return Response(srz_data.data)
+        # srz_data = ReserveSerializer(instance=reserves, many=True)
+        payload = Paginate.page(self, request, reserves, self.serializer_class)
+        return Response(payload)
 
 
 class ChangeDeskPriceAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
-        desk_obj = get_object_or_404(Desk, id=request.data['desk_id'])
+        id = request.data['desk_id']
+        try:
+            desk_obj = Desk.objects.get(id=id)
+        except:
+            return Response({'msg': 'desk does not exists'})
         desk_obj.price = request.data['price']
         desk_obj.save()
-
+        return Response({'msg': 'desk price changed'})
 
 
 class GetThisWeekReservesAPI(APIView):
@@ -266,7 +286,6 @@ class GetThisWeekReservesAPI(APIView):
 
     def post(self, request):
         pass
-
 
 
 class ChangeMultiDesksPriceAPI(APIView):
@@ -312,3 +331,57 @@ class AdminCancelReservationAPI(APIView):
         reserve_obj.delete()
         return Response({'msg': 'object deleted'})
 
+
+class Paginate(APIView):
+    def page(self, request, queryset, serializer):
+        page_number = request.data['page']
+        per_page = request.data['per_page']
+        # startswith = request.data['startswith']
+        paginator = Paginator(queryset, per_page)
+        page_range = list(paginator.get_elided_page_range(page_number, on_each_side=3))
+        page_obj = paginator.get_page(page_number)
+        # data = [{"name": kw} for kw in page_obj.object_list]
+        srz_data = serializer(instance=page_obj.object_list, many=True)
+
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+            },
+            "data": srz_data.data
+        }
+        print('=========')
+        print(payload)
+        return payload
+
+
+class GetUserViaPhoneAPI(APIView):
+    """
+    body{
+    phone_number: string
+    }
+    """
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+
+    def get(self, request):
+        phone = request.data['phone_number']
+        try:
+            user = User.objects.filter(phone_number__contains=phone)
+        except:
+            return Response({'msg': 'user does not exists'})
+        srz_data = UserSerializer(instance=user, many=True)
+        return Response(srz_data.data)
+
+
+class GetUsersListAPI(APIView):
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = UserSerializer
+
+    def get(self, request):
+        users = User.objects.all()
+        filter = UserFilter(request.data, queryset=users)
+        # srz_data = UserSerializer(instance=filter.qs, many=True)
+        payload = Paginate.page(self, request, filter.qs, self.serializer_class)
+        return Response(payload)

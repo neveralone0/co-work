@@ -1,5 +1,3 @@
-import os.path
-import random
 from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import JSONParser, MultiPartParser
@@ -12,6 +10,9 @@ from utils import send_otp_code
 from accounting.serializers import UserRegisterSerializer, UserSerializer, MiniUserRegisterSerializer
 from accounting.permissions import IsAdminOrReadOnly, IsNotBanned
 from helpers.helpers import WORKING_CATEGORY
+import datetime
+import os.path
+import random
 
 
 class RegisterUser(APIView):
@@ -131,6 +132,7 @@ class VerifyOtpCodeAPI(APIView):
         user = User.objects.get(phone_number=request.data['phone_number'])
         if not user.phone_number_validation:
             user.phone_number_validation = True
+            user.join_date = datetime.datetime.now()
             user.save()
         return Response({})
 
@@ -209,35 +211,6 @@ class GetWorkingCategory(APIView):
         return Response({'topic': items, 'is_ok': True})
 
 
-class GetUserViaPhoneAPI(APIView):
-    """
-    body{
-    phone_number: string
-    }
-    """
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = UserSerializer
-
-    def get(self, request):
-        phone = request.data['phone_number']
-        try:
-            user = User.objects.get(phone_number=phone)
-        except:
-            return Response({'msg': 'user does not exists'})
-        srz_data = UserSerializer(instance=user)
-        return Response(srz_data.data)
-
-
-class GetUsersListAPI(APIView):
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = UserSerializer
-
-    def get(self, request):
-        users = User.objects.all()
-        srz_data = UserSerializer(instance=users, many=True)
-        return Response(srz_data.data)
-
-
 class ResetPasswordAPI(APIView):
     permission_classes = [IsAuthenticated, ]
 
@@ -282,3 +255,4 @@ class RemoveAllCodes(APIView):
         codes = OtpCode.objects.all()
         codes.delete()
         return Response({'msg': 'deleted'})
+
