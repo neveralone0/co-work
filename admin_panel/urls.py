@@ -27,6 +27,8 @@ urlpatterns = [
     path('user-ban-status/', views.UserBanStatusAPI.as_view()),
     path('ban-history/', views.BanHistoryAPI.as_view()),
 
+    path('get-desks/', views.GetDesks.as_view()),
+    path('get-desk/<int:desk_id>/', views.GetSpecificDeskAPI.as_view()),
     path('create-desk/', views.CreateDeskAPI.as_view()),
     path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),
     path('delete-desks/', views.DeskListDeleteAPI.as_view()),
@@ -39,8 +41,6 @@ urlpatterns = [
     path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
 
     path('all-reservations/', views.GetAllReservesAPI.as_view()),
-
-    # path('paginator/', views.Paginate.as_view()),
 
     path('get-all-users/', views.GetUsersListAPI.as_view()),
     path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),

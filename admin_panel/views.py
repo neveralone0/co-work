@@ -224,6 +224,26 @@ class BanHistoryAPI(APIView):
         return Response(payload)
 
 
+
+class GetDesks(APIView):
+    # permission_classes = [IsAuthenticated, IsNotBanned]
+    serializer_class = DeskSerializer
+
+    def get(self, request):
+        desk_list = Desk.objects.all()
+        srz_data = DeskSerializer(instance=desk_list, many=True)
+        return Response(srz_data.data)
+
+
+class GetSpecificDeskAPI(APIView):
+    serializer_class = DeskSerializer
+
+    def get(self, desk_id):
+        desk = Desk.objects.get(pk=desk_id)
+        srz_data = DeskSerializer(instance=desk)
+        return Response(srz_data.data)
+
+
 class CreateDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = DeskSerializer

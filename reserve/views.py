@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
@@ -8,32 +8,31 @@ from .serializers import DeskSerializer, ReserveSerializer
 from accounting.permissions import IsNotBanned
 
 
-class GetDeskAPI(APIView):
-    # permission_classes = [IsAuthenticated, IsNotBanned]
-    serializer_class = DeskSerializer
-
-    def get(self, request):
-        desk_list = Desk.objects.all()
-        srz_data = DeskSerializer(instance=desk_list, many=True)
-        return Response(srz_data.data)
-
-
-class GetSpecificDeskAPI(APIView):
-    serializer_class = DeskSerializer
-
-    def get(self, desk_id):
-        desk = Desk.objects.get(pk=desk_id)
-        srz_data = DeskSerializer(instance=desk)
-        return Response(srz_data.data)
-
-
-class FreeDesksListAPI(APIView):
+class GetReservedDesks(APIView):
     permission_classes = [IsNotBanned, ]
+    serializer_class = ReserveSerializer
+
+    def get(self, request):
+        if request.data['date']:
+            date = request.data['date']
+        else:
+            date = datetime.today()
+        reservations = Desk.objects.filter(reservation__payment=True, reservation__reservation_time=date)
+        srz_data = self.serializer_class(reservations, many=True)
+        return Response(srz_data.data)
+
+
+class GetFreeDesks(APIView):
     serializer_class = DeskSerializer
 
     def get(self, request):
-        desks = Desk.objects.filter(reserved=False)
-        srz_data = DeskSerializer(desks, many=True)
+        today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+        desks = Desk.objects.all()
+        today_reserves = desks.filter(reservation__reservation_time__range=(today_min, today_max))
+        today_reserves = today_reserves.filter(reservation__payment=True)
+        desks = Desk.objects.exclude(pk__in=today_reserves)
+        srz_data = self.serializer_class(instance=desks, many=True)
         return Response(srz_data.data)
 
 
