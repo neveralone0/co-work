@@ -17,26 +17,15 @@ class GetReservedDesks(APIView):
         date = request.query_params.get('date')
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-            date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
-            print('=====')
-            print(date)
         else:
-            # date = datetime.date.today()
-            date = datetime.datetime.today()
-            date = jalali_date.date2jalali(date).strftime('%y-%m-%d')
-            print('============')
-            print(date)
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-        print('====================================================')
-        print(date)
-        rz = Reservation.objects.all()
-        print(rz[1].reservation_time.date())
+            date = datetime.date.today()
+            date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+
         reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                            reservation__reservation_time__month=date.month,
                                            reservation__reservation_time__day=date.day)
-        print('=================')
-        print(reservations)
-        srz_data = self.serializer_class(reservations, many=True)
+        srz_data = DeskSerializer(instance=reservations, many=True)
         return Response(srz_data.data)
 
 
@@ -44,16 +33,19 @@ class GetFreeDesks(APIView):
     serializer_class = DeskSerializer
 
     def get(self, request):
-        if request.query_params['date']:
-            date = request.query_params['date']
+        date = request.query_params.get('date')
+        if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         else:
             date = datetime.date.today()
-        today_reserves = Desk.objects.filter(reservation__reservation_time__day=date)
-        free_desks = Desk.objects.exclude(pk__in=today_reserves)
+            date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+
+        reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
+                                           reservation__reservation_time__month=date.month,
+                                           reservation__reservation_time__day=date.day)
+        free_desks = Desk.objects.exclude(pk__in=reservations)
         srz_data = self.serializer_class(instance=free_desks, many=True)
-        print('=======')
-        print(min)
         return Response(srz_data.data)
 
 

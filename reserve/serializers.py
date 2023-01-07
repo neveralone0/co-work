@@ -10,6 +10,8 @@ class DeskSerializer(serializers.ModelSerializer):
 
 
 class ReserveSerializer(serializers.ModelSerializer):
+    reservation_time = serializers.DateField()
+
     class Meta:
         model = Reservation
         fields = '__all__'
