@@ -377,16 +377,14 @@ class Paginate(APIView):
 
 
 class GetUserViaPhoneAPI(APIView):
-    """
-    body{
-    phone_number: string
-    }
-    """
     # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserSerializer
 
     def get(self, request):
-        phone = request.data['phone_number']
+        # phone = request.data['phone_number']
+        phone = request.query_params['phone_number']
+        print('============')
+        print(phone)
         try:
             user = User.objects.filter(phone_number__contains=phone)
         except:
