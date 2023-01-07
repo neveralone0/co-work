@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer
 from accounting.permissions import IsNotBanned
+import jalali_date
 
 
 class GetReservedDesks(APIView):
@@ -13,11 +14,28 @@ class GetReservedDesks(APIView):
     serializer_class = ReserveSerializer
 
     def get(self, request):
-        if request.data['date']:
-            date = request.data['date']
+        date = request.query_params.get('date')
+        if date:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+            print('=====')
+            print(date)
         else:
-            date = datetime.today()
-        reservations = Desk.objects.filter(reservation__payment=True, reservation__reservation_time=date)
+            # date = datetime.date.today()
+            date = datetime.datetime.today()
+            date = jalali_date.date2jalali(date).strftime('%y-%m-%d')
+            print('============')
+            print(date)
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        print('====================================================')
+        print(date)
+        rz = Reservation.objects.all()
+        print(rz[1].reservation_time.date())
+        reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
+                                           reservation__reservation_time__month=date.month,
+                                           reservation__reservation_time__day=date.day)
+        print('=================')
+        print(reservations)
         srz_data = self.serializer_class(reservations, many=True)
         return Response(srz_data.data)
 
@@ -26,35 +44,47 @@ class GetFreeDesks(APIView):
     serializer_class = DeskSerializer
 
     def get(self, request):
-        today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
-        today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
-        desks = Desk.objects.all()
-        today_reserves = desks.filter(reservation__reservation_time__range=(today_min, today_max))
-        today_reserves = today_reserves.filter(reservation__payment=True)
-        desks = Desk.objects.exclude(pk__in=today_reserves)
-        srz_data = self.serializer_class(instance=desks, many=True)
+        if request.query_params['date']:
+            date = request.query_params['date']
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        else:
+            date = datetime.date.today()
+        today_reserves = Desk.objects.filter(reservation__reservation_time__day=date)
+        free_desks = Desk.objects.exclude(pk__in=today_reserves)
+        srz_data = self.serializer_class(instance=free_desks, many=True)
+        print('=======')
+        print(min)
         return Response(srz_data.data)
 
 
 class ReserveDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsNotBanned]
+    # permission_classes = [IsAuthenticated, IsNotBanned]
     serializer_class = ReserveSerializer
 
     def post(self, request):
-        reserve_check = {
-            'desk': request.data['desk_id'],
-            'reservation_time': request.data['day'],
-            'status': False
-        }
+        for day, desk in request.data:
+            day_min = datetime.datetime.combine(day, datetime.time.min)
+            day_max = datetime.datetime.combine(day, datetime.time.max)
+            reserved_desks = Desk.objects.get(reservation__reservation_time__range=(day_min, day_max),
+                                              id=desk)
+            if reserved_desks:
+                reserved_desks.append(reserved_desks)
+        if reserved_desks:
+            srz_data = DeskSerializer(instance=reserved_desks, many=True)
+            return Response({'msg': 'this desks are reserved for this date',
+                             'days': srz_data.data})
+        price = int()
+        for desk in request.data:
+            price += desk.price
 
-        check = Reservation.objects.filter(**reserve_check)  # IS IT OK ?
-        if check:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        for k, w in request.data:
+            reserve = Reservation.objects.create()
+            reserve.user = request.user.id
+            reserve.reservation_time = k
+            reserve.desk = w
+            reserve.save()
 
-        srz_data = ReserveSerializer(data=request.data)
-        if srz_data.is_valid():
-            srz_data.save()
-            return Response({'msg': 'desk reservation completed'})
+        return Response({'msg': 'done'})
 
 
 class CancelReservationAPI(APIView):
@@ -80,7 +110,6 @@ class CurrentUserReservationsAPI(APIView):
         return Response(srz_data.data)
 
 
-
 class GetTodayReservesAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
@@ -97,3 +126,13 @@ class GetSpecificDayReservationsAPI(APIView):
         reservations = Reservation.objects.filter(reservation_time=date)
         srz_data = ReserveSerializer(instance=reservations, many=True)
         return Response(srz_data.data)
+
+
+class Check(APIView):
+    def post(self, request):
+        date = request.data['date']
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        # user .date() on db object......
+        if datetime.date.today() == date:
+            print('+++++++++++++++++++++++++++++')
+            print('amazing:D')

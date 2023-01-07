@@ -18,6 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from azbankgateways.urls import az_bank_gateways_urls
+
+admin.autodiscover()
 
 
 urlpatterns = [
@@ -26,6 +29,7 @@ urlpatterns = [
     path('reserve/', include('reserve.urls')),
     path('finance/', include('finance.urls')),
     path('admin-panel/', include('admin_panel.urls')),
+    path('bankgateways/', az_bank_gateways_urls()),
 
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
     path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),

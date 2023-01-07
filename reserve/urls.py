@@ -12,4 +12,5 @@ urlpatterns = [
     path('cancle-reserve/', views.CancelReservationAPI.as_view()),
     path('my-reservations/', views.CurrentUserReservationsAPI.as_view()),
 
+    path('check/', views.Check.as_view()),
 ]

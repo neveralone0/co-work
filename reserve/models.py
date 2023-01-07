@@ -14,9 +14,9 @@ class Desk(models.Model):
 class Reservation(models.Model):
     user = models.OneToOneField(to=User, on_delete=models.DO_NOTHING, null=True, blank=True)
     desk = models.OneToOneField(to=Desk, on_delete=models.DO_NOTHING)
-    payment = models.BooleanField(default=False)  # canceled or not
+    # payment = models.BooleanField(default=False)  # canceled or not
     reservation_time = models.DateTimeField()
 
     def __str__(self):
-        return f'{self.desk.id} - {self.payment}'
+        return f'{self.desk.id}'
 
