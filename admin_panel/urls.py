@@ -41,12 +41,15 @@ urlpatterns = [
     path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
 
     path('all-reservations/', views.GetAllReservesAPI.as_view()),
+    path('get-reservations-via-date/', views.GetTodayReservesAPI.as_view()),
+
 
     path('get-all-users/', views.GetUsersListAPI.as_view()),
     path('get-user-by-phone/', views.GetUserViaPhoneAPI.as_view()),
 
     path('get-quotes/', views.GetQuotes.as_view()),
     path('update-quotes/', views.UpdateQuotes.as_view()),
+
 ]
 
 # urlpatterns += router.urls

@@ -32,7 +32,7 @@ class GetReservedDesks(APIView):
 class GetFreeDesks(APIView):
     serializer_class = DeskSerializer
 
-    def get(self, request):
+    def get(self, request, is_admin=False):
         date = request.query_params.get('date')
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
@@ -44,6 +44,7 @@ class GetFreeDesks(APIView):
         reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                            reservation__reservation_time__month=date.month,
                                            reservation__reservation_time__day=date.day)
+
         free_desks = Desk.objects.exclude(pk__in=reservations)
         srz_data = self.serializer_class(instance=free_desks, many=True)
         return Response(srz_data.data)
@@ -53,10 +54,16 @@ class ReserveDeskAPI(APIView):
     # permission_classes = [IsAuthenticated, IsNotBanned]
     serializer_class = ReserveSerializer
 
-    def post(self, request):
+    def post(self, request, is_admin=False):
         reserved_desks = list()
         price = int()
+        count = int()
         data = request.data
+        if data['phone_number']:
+            user = User.objects.get(id=data['phone_number'])
+        else:
+            user = request.user.id
+
         for key in data:
             num = 0
             for i in data[key]:
@@ -70,7 +77,7 @@ class ReserveDeskAPI(APIView):
                 check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
                                                            reservation__reservation_time__month=date.month,
                                                            reservation__reservation_time__day=date.day,
-                                                           id=request.user.id)
+                                                           id=user)
 
                 if check_today_reservation:
                     return Response({'msg': 'you can reserve 1 desk per day'})
@@ -84,6 +91,7 @@ class ReserveDeskAPI(APIView):
                 reserved_desks.append(reservations)
             except:
                 desk = Desk.objects.get(id=data[key])
+                count += 1
                 price += desk.price
 
         if reserved_desks:
@@ -91,17 +99,28 @@ class ReserveDeskAPI(APIView):
             return Response({'msg': 'these desks are reserved for this date',
                              'desks': srz_data.data})
 
+        if count >= 20:
+            price -= 5*count
+        elif count >= 10:
+            price -= 3*count
+
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
-            user = User.objects.get(id=request.user.id)
+            # user = User.objects.get(id=user)
             desk = Desk.objects.get(id=data[key])
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
                 desk=desk
             )
-            # reserve.save()
-        return Response({'msg': 'done, reserved'})
+
+            if is_admin:
+                payment = True
+            else:
+                payment = False
+        return Response({'msg': 'done, reserved',
+                         'price': price,
+                         'payment': payment})
 
 
 # class CancelReservationAPI(APIView):
@@ -125,13 +144,6 @@ class CurrentUserReservationsAPI(APIView):
         reservation_obj = Reservation.objects.filter(user=request.user.id)
         srz_data = self.serializer_class(reservation_obj, many=True)
         return Response(srz_data.data)
-
-
-class GetTodayReservesAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        pass
 
 
 class GetSpecificDayReservationsAPI(APIView):

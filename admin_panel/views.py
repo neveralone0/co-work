@@ -1,3 +1,6 @@
+import datetime
+
+import jalali_date
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from rest_framework.decorators import action
@@ -301,12 +304,6 @@ class ChangeDeskPriceAPI(APIView):
         return Response({'msg': 'desk price changed'})
 
 
-class GetThisWeekReservesAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        pass
-
 
 class ChangeMultiDesksPriceAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -423,3 +420,25 @@ class UpdateQuotes(APIView):
             quote = Quotes.objects.get(id=request.data['id'])
             srz_data.update(quote)
             return Response({'msg': 'updated'})
+
+
+class GetTodayReservesAPI(APIView):
+    serializer_class = ReserveSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        date = request.query_params.get('date')
+        if date:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        else:
+            date = datetime.date.today()
+            date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+
+        reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
+                                           reservation__reservation_time__month=date.month,
+                                           reservation__reservation_time__day=date.day)
+
+        srz_data = self.serializer_class(instance=reservations, many=True)
+        return Response(srz_data.data)
+

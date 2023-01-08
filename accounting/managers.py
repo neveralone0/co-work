@@ -23,7 +23,7 @@ from helpers import helpers
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, national_code, password, is_super_user=False, **kwargs):
+    def create_user(self, phone_number, password, national_code, is_super_user=False, **kwargs):
         user = self.model(
             phone_number=phone_number,
             national_code=national_code,
@@ -43,7 +43,7 @@ class UserManager(BaseUserManager):
     #     return user
 
     def create_superuser(self, phone_number, password, **kwargs):
-        user = self.create_user(phone_number, password, is_super_user=True, **kwargs)
+        user = self.create_user(phone_number, password,national_code=None , is_super_user=True, **kwargs)
         user.is_superuser = True
         user.save(using=self._db)
         return user
