@@ -37,8 +37,8 @@ urlpatterns = [
     path('change-multidesk-price/', views.ChangeMultiDesksPriceAPI.as_view()),
     path('change-alldesks-price/', views.ChangeAllDesksPriceAPI.as_view()),
 
-    path('admin-reserve/', views.AdminReserveDeskAPI.as_view()),
-    path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
+    path('reserve/', views.AdminReserveDeskAPI.as_view()),
+    # path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
 
     path('all-reservations/', views.GetAllReservesAPI.as_view()),
     path('get-reservations-via-date/', views.GetTodayReservesAPI.as_view()),

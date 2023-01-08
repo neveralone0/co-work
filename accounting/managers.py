@@ -43,7 +43,7 @@ class UserManager(BaseUserManager):
     #     return user
 
     def create_superuser(self, phone_number, password, **kwargs):
-        user = self.create_user(phone_number, password,national_code=None , is_super_user=True, **kwargs)
+        user = self.create_user(phone_number, password, national_code=None, is_super_user=True, **kwargs)
         user.is_superuser = True
         user.save(using=self._db)
         return user

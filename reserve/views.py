@@ -59,18 +59,25 @@ class ReserveDeskAPI(APIView):
         price = int()
         count = int()
         data = request.data
-        if data['phone_number']:
-            user = User.objects.get(id=data['phone_number'])
-        else:
+        data = data.copy()
+        payment = data['payment']
+        del(data['payment'])
+        user = data['phone_number']
+        del(data['phone_number'])
+        try:
+            user = User.objects.get(id=user)
+        except:
             user = request.user.id
-
+            user = User.objects.get(id=user)
+        print('=============thedata')
+        
         for key in data:
-            num = 0
-            for i in data[key]:
-                num += 1
-                if num > 1:
-                    return Response({'msg': 'date is duplicated (you can reserve 1 desk per day)'})
-            num = 0
+            # num = 0
+            # for i in data[key]:
+            #     num += 1
+            #     if num > 3:
+            #         return Response({'msg': 'date is duplicated (you can reserve 1 desk per day)'})
+            # num = 0
 
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             try:
@@ -106,7 +113,6 @@ class ReserveDeskAPI(APIView):
 
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
-            # user = User.objects.get(id=user)
             desk = Desk.objects.get(id=data[key])
             Reservation.objects.create(
                 user=user,

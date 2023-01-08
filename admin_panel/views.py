@@ -1,5 +1,4 @@
 import datetime
-
 import jalali_date
 from django.core.paginator import Paginator
 from django.http import JsonResponse
@@ -9,6 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, File
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework import viewsets
 from accounting.serializers import UserSerializer
+from reserve.views import ReserveDeskAPI
 from reserve.models import Reservation, Desk
 from reserve.serializers import ReserveSerializer, DeskSerializer
 from .serializers import *
@@ -329,15 +329,18 @@ class ChangeAllDesksPriceAPI(APIView):
 
 class AdminReserveDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = ReserveSerializer
 
     def post(self, request):
-        srz_data = ReserveSerializer(data=request.data)
-        if srz_data.is_valid():
-            srz_data.save()
-            return Response(srz_data.data)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-
+        payment = request.data['payment']
+        if payment:
+            payment = True
+        else:
+            payment = False
+        response = ReserveDeskAPI.post(self, request, is_admin=payment)
+        print('=admin=================')
+        print(response)
+        # return Response(response)
+        return response
 
 class AdminCancelReservationAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
