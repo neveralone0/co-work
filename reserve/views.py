@@ -56,13 +56,26 @@ class ReserveDeskAPI(APIView):
     def post(self, request):
         reserved_desks = list()
         price = int()
-
         data = request.data
         for key in data:
-            print('=data=========')
-            print(key)
-            print(data[key])
+            num = 0
+            for i in data[key]:
+                num += 1
+                if num > 1:
+                    return Response({'msg': 'date is duplicated (you can reserve 1 desk per day)'})
+            num = 0
+
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
+            try:
+                check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
+                                                           reservation__reservation_time__month=date.month,
+                                                           reservation__reservation_time__day=date.day,
+                                                           id=request.user.id)
+
+                if check_today_reservation:
+                    return Response({'msg': 'you can reserve 1 desk per day'})
+            except: pass
+
             try:
                 reservations = Desk.objects.get(reservation__reservation_time__year=date.year,
                                                 reservation__reservation_time__month=date.month,
@@ -73,8 +86,6 @@ class ReserveDeskAPI(APIView):
                 desk = Desk.objects.get(id=data[key])
                 price += desk.price
 
-        print('==========')
-        print(price)
         if reserved_desks:
             srz_data = DeskSerializer(instance=reserved_desks, many=True)
             return Response({'msg': 'these desks are reserved for this date',
@@ -83,16 +94,12 @@ class ReserveDeskAPI(APIView):
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             user = User.objects.get(id=request.user.id)
-            print('=========')
-            print(user)
             desk = Desk.objects.get(id=data[key])
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
                 desk=desk
             )
-            print('=date========')
-            print(date)
             # reserve.save()
         return Response({'msg': 'done, reserved'})
 
