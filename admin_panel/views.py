@@ -1,8 +1,6 @@
 import datetime
 import jalali_date
 from django.core.paginator import Paginator
-from django.http import JsonResponse
-from rest_framework.decorators import action
 from rest_framework.views import APIView, Response, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -12,8 +10,8 @@ from reserve.views import ReserveDeskAPI
 from reserve.models import Reservation, Desk
 from reserve.serializers import ReserveSerializer, DeskSerializer
 from .serializers import *
-from utils import UserFilter
 from .models import *
+from utils import UserFilter
 
 
 class GetAllImage(APIView):
@@ -54,6 +52,11 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 
 class DeleteImage(APIView):
+    """
+    body{\n
+    id
+    }
+    """
     def delete(self, request):
         id = request.data['id']
         img = Images.objects.filter(id=id)
@@ -62,6 +65,11 @@ class DeleteImage(APIView):
 
 
 class ListDeleteImages(APIView):
+    """
+    body{\n
+    ids = array of ids
+    }
+    """
     def delete(self, request):
         ids = request.data['ids']
         imgs = Images.objects.filter(id__in=ids)
@@ -97,6 +105,10 @@ class CardAPI(APIView):
         return Response(srz_data.data)
 
     def post(self, request):
+        """
+        body{\n
+        }
+        """
         for card in request.data:
             obj = Cards.objects.get(id=card['id'])
             srz_data = self.serializer_class(data=card, instance=obj)
@@ -145,6 +157,11 @@ class MyModelViewSet(viewsets.ModelViewSet):
 
 
 class BanUserAPI(APIView):
+    """
+    body{\n
+    user = (user id)
+    }
+    """
     # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = BanSerializer
 
@@ -164,6 +181,11 @@ class BanUserAPI(APIView):
 
 
 class UnbanUserAPI(APIView):
+    """
+    body{\n
+    user = (user id)
+    }
+    """
     # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
@@ -187,6 +209,11 @@ class CurrentlyBannedUsersAPI(APIView):
 
 
 class UserBanHistoryAPI(APIView):
+    """
+    body{\n
+    user = (user id)
+    }
+    """
     permission_classes = [IsAuthenticated, ]
     serializer_class = BanSerializer
 
@@ -199,6 +226,11 @@ class UserBanHistoryAPI(APIView):
 
 
 class UserBanStatusAPI(APIView):
+    """
+    body{\n
+    user = (user id)
+    }
+    """
     permission_classes = [IsAuthenticated, ]
     serializer_class = BanSerializer
 
@@ -260,6 +292,11 @@ class DeleteDeskAPI(APIView):
 
 
 class DeskListDeleteAPI(APIView):
+    """
+    body{\n
+    desks = (array of desk ids)
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def delete(self, request):
@@ -282,6 +319,11 @@ class GetAllReservesAPI(APIView):
 
 
 class ChangeDeskPriceAPI(APIView):
+    """
+    body{\n
+    desk_id, price
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
@@ -295,8 +337,12 @@ class ChangeDeskPriceAPI(APIView):
         return Response({'msg': 'desk price changed'})
 
 
-
 class ChangeMultiDesksPriceAPI(APIView):
+    """
+    body{\n
+    desk_list (array of desk ids)\n
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
@@ -308,6 +354,11 @@ class ChangeMultiDesksPriceAPI(APIView):
 
 
 class ChangeAllDesksPriceAPI(APIView):
+    """
+    body{\n
+    price
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
@@ -320,6 +371,16 @@ class ChangeAllDesksPriceAPI(APIView):
 
 
 class AdminReserveDeskAPI(APIView):
+    """
+    body{\n
+    +++++++++++++++++++++++++++++++++++++
+    ONLY:\n
+    payment = boolean (offline payment if false)\n
+    phone_number = user phone...\n
+    key values...\n
+    {1401-01-01: 12},{1401-01-02: 12}
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
@@ -365,6 +426,11 @@ class Paginate(APIView):
 
 class GetUserViaPhoneAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
+    """
+    body{\n
+    phone_number
+    }
+    """
     serializer_class = UserSerializer
 
     def get(self, request):
@@ -400,6 +466,11 @@ class GetQuotes(APIView):
 
 
 class UpdateQuotes(APIView):
+    """
+    body{\n
+    id
+    }
+    """
     serializer_class = QuoteSerializer
 
     def post(self, request):
@@ -411,11 +482,16 @@ class UpdateQuotes(APIView):
 
 
 class GetTodayReservesAPI(APIView):
+    """
+    body{\n
+    date = 1401-01-01
+    }
+    """
     serializer_class = ReserveSerializer
     permission_classes = [IsAuthenticated, IsAdminUser]
 
-    def get(self, request):
-        date = request.query_params.get('date')
+    def post(self, request):
+        date = request.data['date']
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         else:
@@ -429,4 +505,3 @@ class GetTodayReservesAPI(APIView):
 
         srz_data = self.serializer_class(instance=reservations, many=True)
         return Response(srz_data.data)
-

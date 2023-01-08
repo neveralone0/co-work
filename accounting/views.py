@@ -166,23 +166,6 @@ class UpdateUserInfo(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class Weired(APIView):
-    def post(self):
-        srz_data = UserRegisterSerializer
-
-    # # @action(detail=True, methods=['PUT'])
-    # def perform_update(self, serializer, pk):
-    #     serializer.save()
-
-    # def post(self, request):
-    #     user = request.user.phone_number
-    #     user = User.objects.get(phone_number=user)
-    #     srz_data = self.serializer_class(data=request.data, instance=user, partial=True)
-    #     if srz_data.is_valid():
-    #         return Response({'message': 'updated'})
-    #
-
-
 class TempUpdateUser(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserRegisterSerializer
@@ -210,19 +193,19 @@ class GetWorkingCategory(APIView):
 
         return Response({'topic': items, 'is_ok': True})
 
-
-class ResetPasswordAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
-
-    def post(self, request):
-        user = request.user
-        password = request.data['password']
-        if not check_password(password, request.user.password):
-            print('wrong!')
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        user.set_password(request.data['new_password'])
-        user.save()
-        return Response({'message': 'ok'})
+#
+# class ResetPasswordAPI(APIView):
+#     permission_classes = [IsAuthenticated, ]
+#
+#     def post(self, request):
+#         user = request.user
+#         password = request.data['password']
+#         if not check_password(password, request.user.password):
+#             print('wrong!')
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
+#         user.set_password(request.data['new_password'])
+#         user.save()
+#         return Response({'message': 'ok'})
 
 
 class RemoveUserAPI(APIView):
