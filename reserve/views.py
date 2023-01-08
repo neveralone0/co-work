@@ -119,11 +119,11 @@ class ReserveDeskAPI(APIView):
 
 class CurrentUserReservationsAPI(APIView):
     permission_classes = [IsAuthenticated, ]
-    serializer_class = DeskSerializer
+    serializer_class = ReserveSerializer
 
     def get(self, request):
-        reservation_obj = Reservation.objects.filter(user__in=request.user)
-        srz_data = DeskSerializer(reservation_obj, many=True)
+        reservation_obj = Reservation.objects.filter(user=request.user.id)
+        srz_data = self.serializer_class(reservation_obj, many=True)
         return Response(srz_data.data)
 
 
