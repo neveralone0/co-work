@@ -69,7 +69,6 @@ class ReserveDeskAPI(APIView):
         except:
             user = request.user.id
             user = User.objects.get(id=user)
-        print('=============thedata')
 
         for key in data:
             # num = 0

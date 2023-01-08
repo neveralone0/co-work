@@ -150,25 +150,17 @@ class BanUserAPI(APIView):
 
     def post(self, request):
         srz_data = BanSerializer(data=request.data)
-        print('-1')
         if srz_data.is_valid():
             user = request.data['user']
-            print('0')
             try:
-                print('1')
                 check = User.objects.filter(bans__status=True, id=user).exists()
                 if check:
-                    print('okk')
                     return Response({'msg': 'user already banned!'}, status=status.HTTP_400_BAD_REQUEST)
             except Exception as e:
                 print(e)
                 return Response({'msg': 'user not found!'}, status=status.HTTP_400_BAD_REQUEST)
-            print('3')
             srz_data.create(validated_data=srz_data.validated_data)
-            print('6')
             return Response({'msg': 'user banned'})
-        print('============')
-        print(srz_data.errors)
 
 
 class UnbanUserAPI(APIView):
@@ -227,9 +219,8 @@ class BanHistoryAPI(APIView):
         return Response(payload)
 
 
-
 class GetDesks(APIView):
-    # permission_classes = [IsAuthenticated, IsNotBanned]
+    permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = DeskSerializer
 
     def get(self, request):
@@ -338,9 +329,6 @@ class AdminReserveDeskAPI(APIView):
         else:
             payment = False
         response = ReserveDeskAPI.post(self, request, is_admin=payment)
-        print('=admin=================')
-        print(response)
-        # return Response(response)
         return response
 
 class AdminCancelReservationAPI(APIView):
@@ -372,8 +360,6 @@ class Paginate(APIView):
             },
             "data": srz_data.data
         }
-        print('=========')
-        print(payload)
         return payload
 
 
@@ -384,8 +370,6 @@ class GetUserViaPhoneAPI(APIView):
     def get(self, request):
         # phone = request.data['phone_number']
         phone = request.query_params['phone_number']
-        print('============')
-        print(phone)
         try:
             user = User.objects.filter(phone_number__contains=phone)
         except:
