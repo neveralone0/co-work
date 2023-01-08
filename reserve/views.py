@@ -70,7 +70,7 @@ class ReserveDeskAPI(APIView):
             user = request.user.id
             user = User.objects.get(id=user)
         print('=============thedata')
-        
+
         for key in data:
             # num = 0
             # for i in data[key]:

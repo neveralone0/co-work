@@ -325,6 +325,7 @@ class ChangeAllDesksPriceAPI(APIView):
         for desk in desk_list:
             desk.price = price
             desk.save()
+        return Response({'msg': 'done'})
 
 
 class AdminReserveDeskAPI(APIView):
