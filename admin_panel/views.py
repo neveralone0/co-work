@@ -392,14 +392,14 @@ class AdminReserveDeskAPI(APIView):
         response = ReserveDeskAPI.post(self, request, is_admin=payment)
         return response
 
-class AdminCancelReservationAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-
-    def post(self, request):
-        reserve_id = request.data['reserve_id']
-        reserve_obj = Reservation.objects.filter(id=reserve_id).exists()
-        reserve_obj.delete()
-        return Response({'msg': 'object deleted'})
+# class AdminCancelReservationAPI(APIView):
+#     permission_classes = [IsAuthenticated, IsAdminUser]
+#
+#     def post(self, request):
+#         reserve_id = request.data['reserve_id']
+#         reserve_obj = Reservation.objects.filter(id=reserve_id).exists()
+#         reserve_obj.delete()
+#         return Response({'msg': 'object deleted'})
 
 
 class Paginate(APIView):
@@ -504,4 +504,26 @@ class GetTodayReservesAPI(APIView):
                                            reservation__reservation_time__day=date.day)
 
         srz_data = self.serializer_class(instance=reservations, many=True)
+        return Response(srz_data.data)
+
+
+class GetAllIncome(APIView):
+    serializer_class = IncomeSerializer
+
+    def post(self, request):
+        income = Income.objects.all()
+        srz_data = self.serializer_class(instance=income, many=True)
+        return Response(srz_data.data)
+
+
+class GetMonthIncome(APIView):
+    serializer_class = IncomeSerializer
+
+    def post(self, request):
+        date = datetime.date.today()
+        date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+
+        income = Income.objects.filter(date__month=date.month)
+        srz_data = self.serializer_class(instance=income, many=True)
         return Response(srz_data.data)

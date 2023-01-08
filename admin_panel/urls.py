@@ -50,6 +50,9 @@ urlpatterns = [
     path('get-quotes/', views.GetQuotes.as_view()),
     path('update-quotes/', views.UpdateQuotes.as_view()),
 
+    path('get-all-income/', views.GetAllIncome.as_view()),
+    path('get-month-income/', views.GetMonthIncome.as_view()),
+
 ]
 
 # urlpatterns += router.urls

@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer
 from accounting.permissions import IsNotBanned
+from admin_panel.models import Income
 import jalali_date
 
 
@@ -13,8 +14,14 @@ class GetReservedDesks(APIView):
     permission_classes = [IsNotBanned, ]
     serializer_class = ReserveSerializer
 
-    def get(self, request):
-        date = request.query_params.get('date')
+    def post(self, request):
+        """
+        body{\n
+        date = 1401-01-01 \n
+        NOTE: by default returns TODAY if empty
+        }
+        """
+        date = request.data['date']
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         else:
@@ -30,10 +37,16 @@ class GetReservedDesks(APIView):
 
 
 class GetFreeDesks(APIView):
+    """
+    body{\n
+    date = 1401-01-01 \n
+    NOTE: by default returns TODAY if empty
+    }
+    """
     serializer_class = DeskSerializer
 
     def get(self, request, is_admin=False):
-        date = request.query_params.get('date')
+        date = request.data['date']
         if date:
             date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         else:
@@ -51,6 +64,11 @@ class GetFreeDesks(APIView):
 
 
 class ReserveDeskAPI(APIView):
+    """
+    body{\n
+    {1401-01-01: 12},{1401-01-02: 12}
+    }
+    """
     # permission_classes = [IsAuthenticated, IsNotBanned]
     serializer_class = ReserveSerializer
 
@@ -60,10 +78,12 @@ class ReserveDeskAPI(APIView):
         count = int()
         data = request.data
         data = data.copy()
-        payment = data['payment']
-        del(data['payment'])
-        user = data['phone_number']
-        del(data['phone_number'])
+        try:
+            payment = data['payment']
+            del(data['payment'])
+            user = data['phone_number']
+            del(data['phone_number'])
+        except: pass
         try:
             user = User.objects.get(id=user)
         except:
@@ -123,6 +143,17 @@ class ReserveDeskAPI(APIView):
                 payment = True
             else:
                 payment = False
+
+        date = datetime.date.today()
+        date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+
+        Income.objects.create(
+            user=user,
+            date=date,
+            amount=price
+        )
+
         return Response({'msg': 'done, reserved',
                          'price': price,
                          'payment': payment})
@@ -152,6 +183,11 @@ class CurrentUserReservationsAPI(APIView):
 
 
 class GetSpecificDayReservationsAPI(APIView):
+    """
+    body{\n
+    date = 1401-1-1
+    }
+    """
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ReserveSerializer
 
