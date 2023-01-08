@@ -54,42 +54,60 @@ class ReserveDeskAPI(APIView):
     serializer_class = ReserveSerializer
 
     def post(self, request):
-        for day, desk in request.data:
-            day_min = datetime.datetime.combine(day, datetime.time.min)
-            day_max = datetime.datetime.combine(day, datetime.time.max)
-            reserved_desks = Desk.objects.get(reservation__reservation_time__range=(day_min, day_max),
-                                              id=desk)
-            if reserved_desks:
-                reserved_desks.append(reserved_desks)
+        reserved_desks = list()
+        price = int()
+
+        data = request.data
+        for key in data:
+            print('=data=========')
+            print(key)
+            print(data[key])
+            date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
+            try:
+                reservations = Desk.objects.get(reservation__reservation_time__year=date.year,
+                                                reservation__reservation_time__month=date.month,
+                                                reservation__reservation_time__day=date.day,
+                                                id=int(data[key]))
+                reserved_desks.append(reservations)
+            except:
+                desk = Desk.objects.get(id=data[key])
+                price += desk.price
+
+        print('==========')
+        print(price)
         if reserved_desks:
             srz_data = DeskSerializer(instance=reserved_desks, many=True)
-            return Response({'msg': 'this desks are reserved for this date',
-                             'days': srz_data.data})
-        price = int()
-        for desk in request.data:
-            price += desk.price
+            return Response({'msg': 'these desks are reserved for this date',
+                             'desks': srz_data.data})
 
-        for k, w in request.data:
-            reserve = Reservation.objects.create()
-            reserve.user = request.user.id
-            reserve.reservation_time = k
-            reserve.desk = w
-            reserve.save()
+        for key in data:
+            date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
+            user = User.objects.get(id=request.user.id)
+            print('=========')
+            print(user)
+            desk = Desk.objects.get(id=data[key])
+            Reservation.objects.create(
+                user=user,
+                reservation_time=date,
+                desk=desk
+            )
+            print('=date========')
+            print(date)
+            # reserve.save()
+        return Response({'msg': 'done, reserved'})
 
-        return Response({'msg': 'done'})
 
-
-class CancelReservationAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
-
-    def patch(self, request):
-        reserve_id = request.data['reserve_id']
-        reserve = Reservation.objects.get(id=reserve_id)
-        if reserve.user.id == request.user.id:
-            reserve.status = True
-            reserve.save()
-            return Response({})
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+# class CancelReservationAPI(APIView):
+#     permission_classes = [IsAuthenticated, ]
+#
+#     def patch(self, request):
+#         reserve_id = request.data['reserve_id']
+#         reserve = Reservation.objects.get(id=reserve_id)
+#         if reserve.user.id == request.user.id:
+#             reserve.status = True
+#             reserve.save()
+#             return Response({})
+#         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class CurrentUserReservationsAPI(APIView):
