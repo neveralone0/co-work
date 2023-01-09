@@ -19,4 +19,3 @@ class Reservation(models.Model):
 
     def __str__(self):
         return f'{self.desk.id} - {self.payment}'
-

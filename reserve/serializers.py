@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Desk, Reservation
+from admin_panel.models import Income
 
 
 class DeskSerializer(serializers.ModelSerializer):
@@ -14,4 +15,10 @@ class ReserveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
+        fields = '__all__'
+
+
+class ReceiptSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Income
         fields = '__all__'

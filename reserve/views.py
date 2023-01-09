@@ -4,7 +4,7 @@ from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
-from .serializers import DeskSerializer, ReserveSerializer
+from .serializers import DeskSerializer, ReserveSerializer, ReceiptSerializer
 from accounting.permissions import IsNotBanned
 from admin_panel.models import Income
 import jalali_date
@@ -79,8 +79,6 @@ class ReserveDeskAPI(APIView):
         data = request.data
         data = data.copy()
         try:
-            payment = data['payment']
-            del(data['payment'])
             user = data['phone_number']
             del(data['phone_number'])
         except: pass
@@ -136,7 +134,8 @@ class ReserveDeskAPI(APIView):
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
-                desk=desk
+                desk=desk,
+                count=count
             )
 
             if is_admin:
@@ -206,3 +205,24 @@ class Check(APIView):
         if datetime.date.today() == date:
             print('+++++++++++++++++++++++++++++')
             print('amazing:D')
+
+
+class GetDesks(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = DeskSerializer
+
+    def get(self, request):
+        desk_list = Desk.objects.all()
+        srz_data = DeskSerializer(instance=desk_list, many=True)
+        return Response(srz_data.data)
+
+
+class GetMyReceipts(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        id = request.user.id
+        user = User.objects.get(id=id)
+        receipts = Income.objects.filter(user=user)
+        srz_data = ReceiptSerializer(instance=receipts, many=True)
+        return Response(srz_data.data)

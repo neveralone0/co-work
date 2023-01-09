@@ -27,7 +27,6 @@ urlpatterns = [
     path('user-ban-status/', views.UserBanStatusAPI.as_view()),
     path('ban-history/', views.BanHistoryAPI.as_view()),
 
-    path('get-desks/', views.GetDesks.as_view()),
     path('get-desk/<int:desk_id>/', views.GetSpecificDeskAPI.as_view()),
     path('create-desk/', views.CreateDeskAPI.as_view()),
     path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),

@@ -251,16 +251,6 @@ class BanHistoryAPI(APIView):
         return Response(payload)
 
 
-class GetDesks(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DeskSerializer
-
-    def get(self, request):
-        desk_list = Desk.objects.all()
-        srz_data = DeskSerializer(instance=desk_list, many=True)
-        return Response(srz_data.data)
-
-
 class GetSpecificDeskAPI(APIView):
     serializer_class = DeskSerializer
 
@@ -384,11 +374,7 @@ class AdminReserveDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
-        payment = request.data['payment']
-        if payment:
-            payment = True
-        else:
-            payment = False
+        payment = True
         response = ReserveDeskAPI.post(self, request, is_admin=payment)
         return response
 
