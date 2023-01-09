@@ -135,7 +135,6 @@ class ReserveDeskAPI(APIView):
                 user=user,
                 reservation_time=date,
                 desk=desk,
-                count=count
             )
 
             if is_admin:
@@ -150,7 +149,8 @@ class ReserveDeskAPI(APIView):
         Income.objects.create(
             user=user,
             date=date,
-            amount=price
+            amount=price,
+            desk_count=count
         )
 
         return Response({'msg': 'done, reserved',
