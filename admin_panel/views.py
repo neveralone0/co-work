@@ -275,9 +275,9 @@ class CreateDeskAPI(APIView):
 class DeleteDeskAPI(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
-    def delete(self, request, pk):
-        desk = Desk.objects.filter(pk=pk)
-        desk[0].delete()
+    def delete(self, request, desk_id):
+        desk = Desk.objects.get(pk=desk_id)
+        desk.delete()
         return Response({'msg': 'deleted'})
 
 
