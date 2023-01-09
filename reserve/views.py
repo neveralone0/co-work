@@ -80,23 +80,15 @@ class ReserveDeskAPI(APIView):
         data = data.copy()
         try:
             user = data['phone_number']
-            print('=u1')
-            print(user)
             del(data['phone_number'])
         except: pass
         try:
             user = User.objects.get(id=user)
-            print('=u2')
-            print(user)
         except:
             user = request.user.id
             user = User.objects.get(id=user)
-            print('=u3')
-            print(user)
 
         for key in data:
-            print('==============key')
-            print(key)
             # num = 0
             # for i in data[key]:
             #     num += 1
@@ -105,21 +97,15 @@ class ReserveDeskAPI(APIView):
             # num = 0
 
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
-            print(date)
             try:
-                print('HERE1')
-                print(date)
-                print(user)
                 check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
                                                            reservation__reservation_time__month=date.month,
                                                            reservation__reservation_time__day=date.day,
                                                            id=user.id)
-                print('HERE1.5')
                 if check_today_reservation:
-                    print('HERE2')
                     return Response({'msg': 'you can reserve 1 desk per day'})
-            except Exception as e:
-                print(e)
+            except:
+                pass
 
 
             try:
