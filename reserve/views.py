@@ -11,7 +11,7 @@ import jalali_date
 
 
 class GetReservedDesks(APIView):
-    permission_classes = [IsNotBanned, ]
+    # permission_classes = [IsNotBanned, ]
     serializer_class = ReserveSerializer
 
     def post(self, request):
@@ -209,7 +209,7 @@ class Check(APIView):
 
 
 class GetDesks(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = DeskSerializer
 
     def get(self, request):

@@ -214,7 +214,7 @@ class UserBanHistoryAPI(APIView):
     user = (user id)
     }
     """
-    permission_classes = [IsAuthenticated, ]
+    # permission_classes = [IsAuthenticated, ]
     serializer_class = BanSerializer
 
     def get(self, request):
@@ -231,7 +231,7 @@ class UserBanStatusAPI(APIView):
     user = (user id)
     }
     """
-    permission_classes = [IsAuthenticated, ]
+    # permission_classes = [IsAuthenticated, ]
     serializer_class = BanSerializer
 
     def get(self, request):
@@ -261,7 +261,7 @@ class GetSpecificDeskAPI(APIView):
 
 
 class CreateDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = DeskSerializer
 
     def post(self, request):
@@ -273,7 +273,7 @@ class CreateDeskAPI(APIView):
 
 
 class DeleteDeskAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def delete(self, request, desk_id):
         desk = Desk.objects.get(pk=desk_id)
@@ -287,7 +287,7 @@ class DeskListDeleteAPI(APIView):
     desks = (array of desk ids)
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def delete(self, request):
         desk_ids = request.data['desks']
@@ -298,7 +298,7 @@ class DeskListDeleteAPI(APIView):
 
 
 class GetAllReservesAPI(APIView):
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ReserveSerializer
 
     def get(self, request):
@@ -314,7 +314,7 @@ class ChangeDeskPriceAPI(APIView):
     desk_id, price
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         id = request.data['desk_id']
@@ -333,7 +333,7 @@ class ChangeMultiDesksPriceAPI(APIView):
     desk_list (array of desk ids)\n
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         desk_list = Desk.objects.filter(id__in=request.data['desk_list'])
@@ -349,7 +349,7 @@ class ChangeAllDesksPriceAPI(APIView):
     price
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         desk_list = Desk.objects.all()
@@ -371,7 +371,7 @@ class AdminReserveDeskAPI(APIView):
     {1401-01-01: 12},{1401-01-02: 12}
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         payment = True
@@ -474,7 +474,7 @@ class GetTodayReservesAPI(APIView):
     }
     """
     serializer_class = ReserveSerializer
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
         date = request.data['date']

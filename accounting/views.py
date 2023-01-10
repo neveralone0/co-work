@@ -209,7 +209,7 @@ class GetWorkingCategory(APIView):
 
 
 class RemoveUserAPI(APIView):
-    permission_classes = [IsAdminUser, IsAdminUser]
+    # permission_classes = [IsAdminUser, IsAdminUser]
 
     def post(self, request, user_id):
         user = User.objects.get(id=user_id)
