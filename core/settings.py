@@ -163,9 +163,9 @@ REST_FRAMEWORK = {
 from django.utils.timezone import timedelta
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFE_TIME': timedelta(days=10),
+    'ACCESS_TOKEN_LIFE_TIME': timedelta(minutes=14),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
-    'ROTATE_REFRESH_TOKENS': True,
+    'ROTATE_REFRESH_TOKENS': False,
 }
 
 SPECTACULAR_SETTINGS = {

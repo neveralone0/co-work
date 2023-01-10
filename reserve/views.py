@@ -46,8 +46,6 @@ class GetFreeDesks(APIView):
         data = request.data
         free_resp = dict()
         for d in data:
-            print('=====')
-            print(d)
             date = datetime.datetime.strptime(data[d], "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                reservation__reservation_time__month=date.month,
@@ -85,13 +83,6 @@ class ReserveDeskAPI(APIView):
             user = User.objects.get(id=user)
 
         for key in data:
-            # num = 0
-            # for i in data[key]:
-            #     num += 1
-            #     if num > 3:
-            #         return Response({'msg': 'date is duplicated (you can reserve 1 desk per day)'})
-            # num = 0
-
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             try:
                 check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
