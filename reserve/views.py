@@ -44,7 +44,7 @@ class GetFreeDesks(APIView):
 
     def post(self, request, is_admin=False):
         data = request.data
-        free_resp = dict()
+        full_days = dict()
         for d in data:
             date = datetime.datetime.strptime(data[d], "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
@@ -52,9 +52,14 @@ class GetFreeDesks(APIView):
                                                reservation__reservation_time__day=date.day)
 
             free_desks = Desk.objects.exclude(pk__in=reservations)
-            srz_data = self.serializer_class(instance=free_desks, many=True)
-            free_resp[d] = srz_data.data
-        return Response(free_resp)
+            if not free_desks:
+                full_days[data[d]] = data[d]
+
+        if not full_days:
+            return Response({'msg': True})
+        else:
+            return Response({'msg': False,
+                             'full_days': full_days})
 
 
 class ReserveDeskAPI(APIView):
