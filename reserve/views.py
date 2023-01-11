@@ -4,7 +4,7 @@ from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
-from .serializers import DeskSerializer, ReserveSerializer, ReceiptSerializer
+from .serializers import DeskSerializer, ReserveSerializer, ReceiptSerializer, FreeDeskSerializer
 from accounting.permissions import IsNotBanned
 from admin_panel.models import Income
 import jalali_date
@@ -40,7 +40,7 @@ class GetFreeDesks(APIView):
     NOTE: by default returns TODAY if empty
     }
     """
-    serializer_class = DeskSerializer
+    serializer_class = FreeDeskSerializer
 
     def post(self, request, is_admin=False):
         data = request.data

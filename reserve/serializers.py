@@ -3,6 +3,10 @@ from .models import Desk, Reservation
 from admin_panel.models import Income
 
 
+class FreeDeskSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+
 class DeskSerializer(serializers.ModelSerializer):
 
     class Meta:
