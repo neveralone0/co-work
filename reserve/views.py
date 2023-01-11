@@ -107,8 +107,6 @@ class ReserveDeskAPI(APIView):
                                                    reservation__reservation_time__month=date.month,
                                                    reservation__reservation_time__day=date.day)
                 free_desks = Desk.objects.exclude(pk__in=reservations)
-                print('=============')
-                print(free_desks)
                 if free_desks:
                     count += 1
                     price += 30
