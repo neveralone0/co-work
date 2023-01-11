@@ -44,7 +44,7 @@ class GetFreeDesks(APIView):
 
     def post(self, request, is_admin=False):
         data = request.data
-        full_days = dict()
+        full_days = list()
         for d in data:
             date = datetime.datetime.strptime(data[d], "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
@@ -53,7 +53,7 @@ class GetFreeDesks(APIView):
 
             free_desks = Desk.objects.exclude(pk__in=reservations)
             if not free_desks:
-                full_days[data[d]] = data[d]
+                full_days = data[d]
 
         if not full_days:
             return Response({'msg': True})
@@ -69,18 +69,20 @@ class ReserveDeskAPI(APIView):
     }
     """
     # permission_classes = [IsAuthenticated, IsNotBanned]
-    serializer_class = ReserveSerializer
+    # serializer_class = ReserveSerializer
 
     def post(self, request, is_admin=False):
-        reserved_desks = list()
+        reserve_status = False
+        reserved_desks = dict()
         price = int()
         count = int()
         data = request.data
         data = data.copy()
         try:
             user = data['phone_number']
-            del(data['phone_number'])
-        except: pass
+            del (data['phone_number'])
+        except:
+            pass
         try:
             user = User.objects.get(id=user)
         except:
@@ -99,35 +101,45 @@ class ReserveDeskAPI(APIView):
             except:
                 pass
 
-
             try:
-                reservations = Desk.objects.get(reservation__reservation_time__year=date.year,
-                                                reservation__reservation_time__month=date.month,
-                                                reservation__reservation_time__day=date.day,
-                                                id=int(data[key]))
-                reserved_desks.append(reservations)
+                reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
+                                                   reservation__reservation_time__month=date.month,
+                                                   reservation__reservation_time__day=date.day)
+                free_desks = Desk.objects.exclude(pk__in=reservations)
+                print('=============')
+                print(free_desks)
+                if free_desks:
+                    count += 1
+                    price += 30
+                else:
+                    reserved_desks[key] = data[key]
+                    reserve_status = True
             except:
                 desk = Desk.objects.get(id=data[key])
                 count += 1
-                price += desk.price
+                price += 30
 
-        if reserved_desks:
-            srz_data = DeskSerializer(instance=reserved_desks, many=True)
-            return Response({'msg': 'these desks are reserved for this date',
-                             'desks': srz_data.data})
-
+        if reserve_status:
+            print(reserve_status)
+            # srz_data = DeskSerializer(instance=reserved_desks, many=True)
+            return Response({'msg': 'these dates are full',
+                             'dates': reserved_desks})
+        print('we r not here')
         if count >= 20:
-            price -= 5*count
+            price -= 5 * count
         elif count >= 10:
-            price -= 3*count
+            price -= 3 * count
 
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
-            desk = Desk.objects.get(id=data[key])
+            reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
+                                               reservation__reservation_time__month=date.month,
+                                               reservation__reservation_time__day=date.day)
+            free_desks = Desk.objects.exclude(pk__in=reservations)
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
-                desk=desk,
+                desk=free_desks[0],
             )
 
             if is_admin:
