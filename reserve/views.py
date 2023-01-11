@@ -129,7 +129,6 @@ class ReserveDeskAPI(APIView):
         elif count >= 10:
             price -= 3 * count
 
-
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
