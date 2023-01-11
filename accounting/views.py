@@ -208,16 +208,6 @@ class GetWorkingCategory(APIView):
 #         return Response({'message': 'ok'})
 
 
-class RemoveUserAPI(APIView):
-    # permission_classes = [IsAdminUser, IsAdminUser]
-
-    def post(self, request, user_id):
-        user = User.objects.get(id=user_id)
-        user.is_active = False
-        user.save()
-        return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)
-
-
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated, ]
 

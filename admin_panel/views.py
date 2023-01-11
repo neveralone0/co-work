@@ -513,3 +513,19 @@ class GetMonthIncome(APIView):
         income = Income.objects.filter(date__month=date.month)
         srz_data = self.serializer_class(instance=income, many=True)
         return Response(srz_data.data)
+
+
+class RemoveUserAPI(APIView):
+    """
+    body{\n
+    user_id = int
+    }
+    """
+    # permission_classes = [IsAdminUser, IsAdminUser]
+
+    def post(self, request):
+        user_id = request.data['user_id']
+        user = User.objects.get(id=user_id)
+        user.is_active = False
+        user.save()
+        return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)

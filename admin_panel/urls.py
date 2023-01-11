@@ -52,6 +52,7 @@ urlpatterns = [
     path('get-all-income/', views.GetAllIncome.as_view()),
     path('get-month-income/', views.GetMonthIncome.as_view()),
 
+    path('remove-user/', views.RemoveUserAPI.as_view()),
 ]
 
 # urlpatterns += router.urls
