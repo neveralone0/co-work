@@ -162,19 +162,6 @@ class ReserveDeskAPI(APIView):
                          'payment': payment})
 
 
-# class CancelReservationAPI(APIView):
-#     permission_classes = [IsAuthenticated, ]
-#
-#     def patch(self, request):
-#         reserve_id = request.data['reserve_id']
-#         reserve = Reservation.objects.get(id=reserve_id)
-#         if reserve.user.id == request.user.id:
-#             reserve.status = True
-#             reserve.save()
-#             return Response({})
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
 class CurrentUserReservationsAPI(APIView):
     permission_classes = [IsAuthenticated, ]
     serializer_class = ReserveSerializer
