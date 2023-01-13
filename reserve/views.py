@@ -62,7 +62,6 @@ class GetFreeDesks(APIView):
                              'full_days': full_days})
 
 
-
 class ReserveDeskAPI(APIView):
     """
     body{\n
