@@ -1,3 +1,5 @@
+import requests.utils
+import requests_toolbelt
 from django.contrib.auth.hashers import check_password
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import JSONParser, MultiPartParser
@@ -192,6 +194,15 @@ class GetWorkingCategory(APIView):
             items.append(item[1])
 
         return Response({'topic': items, 'is_ok': True})
+
+
+class WhoAmI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = User.objects.get(id=request.user.id)
+        srz_data = UserSerializer(instance=user)
+        return Response(srz_data.data)
 
 #
 # class ResetPasswordAPI(APIView):
