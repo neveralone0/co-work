@@ -172,11 +172,10 @@ class ReserveDeskAPI(APIView):
 
 class CurrentUserReservationsAPI(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = ReserveSerializer
+    serializer_class = ReceiptSerializer
 
     def get(self, request):
-        reservation_obj = Reservation.objects.filter(user=request.user.id)
-        # srz_data = self.serializer_class(reservation_obj, many=True)
+        reservation_obj = Income.objects.filter(user=request.user.id)
         payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
         return Response(payload)
 
