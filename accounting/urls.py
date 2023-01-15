@@ -26,7 +26,6 @@ urlpatterns = [
     path('update-user-info/', views.TempUpdateUser.as_view()),
     path('who-am-i/', views.WhoAmI.as_view()),
     # path('login/', views.VerifyOtpCodeAPI.as_view()),
-
     path('get-working-category/', views.GetWorkingCategory.as_view()),
 
     # path('reset-password/', views.ResetPasswordAPI.as_view()),

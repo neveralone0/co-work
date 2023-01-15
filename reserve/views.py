@@ -1,4 +1,6 @@
 import datetime
+
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
@@ -89,8 +91,15 @@ class ReserveDeskAPI(APIView):
             user = request.user.id
             user = User.objects.get(id=user)
 
+        now = datetime.date.today()
+        now = jalali_date.date2jalali(now).strftime('%Y-%m-%d')
+        now = datetime.datetime.strptime(now, "%Y-%m-%d").date()
+
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
+            if date < now:
+                print(now)
+                return Response({'msg': 'you cant reserve in past!'})
             try:
                 check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
                                                            reservation__reservation_time__month=date.month,
@@ -162,13 +171,14 @@ class ReserveDeskAPI(APIView):
 
 
 class CurrentUserReservationsAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated]
     serializer_class = ReserveSerializer
 
     def get(self, request):
         reservation_obj = Reservation.objects.filter(user=request.user.id)
-        srz_data = self.serializer_class(reservation_obj, many=True)
-        return Response(srz_data.data)
+        # srz_data = self.serializer_class(reservation_obj, many=True)
+        payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
+        return Response(payload)
 
 
 class GetSpecificDayReservationsAPI(APIView):
@@ -216,3 +226,25 @@ class GetMyReceipts(APIView):
         receipts = Income.objects.filter(user=user)
         srz_data = ReceiptSerializer(instance=receipts, many=True)
         return Response(srz_data.data)
+
+
+class Paginate(APIView):
+    def page(self, request, queryset, serializer):
+        page_number = request.data['page']
+        per_page = request.data['per_page']
+        # startswith = request.data['startswith']
+        paginator = Paginator(queryset, per_page)
+        page_range = list(paginator.get_elided_page_range(page_number, on_each_side=3))
+        page_obj = paginator.get_page(page_number)
+        # data = [{"name": kw} for kw in page_obj.object_list]
+        srz_data = serializer(instance=page_obj.object_list, many=True)
+
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+            },
+            "data": srz_data.data
+        }
+        return payload

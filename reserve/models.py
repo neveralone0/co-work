@@ -16,6 +16,7 @@ class Reservation(models.Model):
     desk = models.ForeignKey(to=Desk, on_delete=models.DO_NOTHING)
     payment = models.BooleanField(default=False)
     reservation_time = models.DateField()
+    order_time = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     def __str__(self):
         return f'{self.desk.id} - {self.payment}'
