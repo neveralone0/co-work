@@ -77,7 +77,8 @@ class ReserveDeskAPI(APIView):
         reserve_status = False
         reserved_desks = dict()
         price = int()
-        count = int()
+        single_count = int()
+        group_count = int()
         data = request.data
         data = data.copy()
         try:
@@ -116,15 +117,17 @@ class ReserveDeskAPI(APIView):
                                                    reservation__reservation_time__day=date.day)
                 free_desks = Desk.objects.exclude(pk__in=reservations)
                 if free_desks:
-                    count += 1
-                    price += 30
+                    if data[key] == 'group':
+                        group_count += 1
+                        price += 50
+                    elif data[key] == 'single':
+                        single_count += 1
+                        price += 30
                 else:
                     reserved_desks[key] = data[key]
                     reserve_status = True
-            except:
-                desk = Desk.objects.get(id=data[key])
-                count += 1
-                price += 30
+            except: pass
+
 
         if reserve_status:
             print(reserve_status)
@@ -132,12 +135,16 @@ class ReserveDeskAPI(APIView):
             return Response({'msg': 'these dates are full',
                              'dates': reserved_desks})
         print('we r not here')
-        if count >= 20:
-            price -= 5 * count
-        elif count >= 10:
-            price -= 3 * count
+        if (single_count+group_count) >= 20:
+            price -= 5 * (single_count+group_count)
+        elif (single_count+group_count) >= 10:
+            price -= 3 * (single_count+group_count)
 
         for key in data:
+            if data[key] == 'group':
+                group = True
+            else:
+                group = False
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                reservation__reservation_time__month=date.month,
@@ -147,6 +154,7 @@ class ReserveDeskAPI(APIView):
                 user=user,
                 reservation_time=date,
                 desk=free_desks[0],
+                is_group=group
             )
 
             if is_admin:
@@ -162,7 +170,8 @@ class ReserveDeskAPI(APIView):
             user=user,
             date=date,
             amount=price,
-            desk_count=count
+            single_count=single_count,
+            group_count=group_count
         )
 
         return Response({'msg': 'done, reserved',
