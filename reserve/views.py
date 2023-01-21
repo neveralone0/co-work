@@ -183,7 +183,7 @@ class CurrentUserReservationsAPI(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ReceiptSerializer
 
-    def get(self, request):
+    def post(self, request):
         reservation_obj = Income.objects.filter(user=request.user.id)
         payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
         return Response(payload)
