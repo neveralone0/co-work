@@ -1,4 +1,6 @@
 import datetime
+
+from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
@@ -75,7 +77,8 @@ class ReserveDeskAPI(APIView):
         reserve_status = False
         reserved_desks = dict()
         price = int()
-        count = int()
+        single_count = int()
+        group_count = int()
         data = request.data
         data = data.copy()
         try:
@@ -89,8 +92,15 @@ class ReserveDeskAPI(APIView):
             user = request.user.id
             user = User.objects.get(id=user)
 
+        now = datetime.date.today()
+        now = jalali_date.date2jalali(now).strftime('%Y-%m-%d')
+        now = datetime.datetime.strptime(now, "%Y-%m-%d").date()
+
         for key in data:
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
+            if date < now:
+                print(now)
+                return Response({'msg': 'you cant reserve in past!'})
             try:
                 check_today_reservation = User.objects.get(reservation__reservation_time__year=date.year,
                                                            reservation__reservation_time__month=date.month,
@@ -107,15 +117,17 @@ class ReserveDeskAPI(APIView):
                                                    reservation__reservation_time__day=date.day)
                 free_desks = Desk.objects.exclude(pk__in=reservations)
                 if free_desks:
-                    count += 1
-                    price += 30
+                    if data[key] == 'group':
+                        group_count += 1
+                        price += 50
+                    elif data[key] == 'single':
+                        single_count += 1
+                        price += 30
                 else:
                     reserved_desks[key] = data[key]
                     reserve_status = True
-            except:
-                desk = Desk.objects.get(id=data[key])
-                count += 1
-                price += 30
+            except: pass
+
 
         if reserve_status:
             print(reserve_status)
@@ -123,12 +135,16 @@ class ReserveDeskAPI(APIView):
             return Response({'msg': 'these dates are full',
                              'dates': reserved_desks})
         print('we r not here')
-        if count >= 20:
-            price -= 5 * count
-        elif count >= 10:
-            price -= 3 * count
+        if (single_count+group_count) >= 20:
+            price -= 5 * (single_count+group_count)
+        elif (single_count+group_count) >= 10:
+            price -= 3 * (single_count+group_count)
 
         for key in data:
+            if data[key] == 'group':
+                group = True
+            else:
+                group = False
             date = datetime.datetime.strptime(key, "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                reservation__reservation_time__month=date.month,
@@ -138,6 +154,7 @@ class ReserveDeskAPI(APIView):
                 user=user,
                 reservation_time=date,
                 desk=free_desks[0],
+                is_group=group
             )
 
             if is_admin:
@@ -153,7 +170,8 @@ class ReserveDeskAPI(APIView):
             user=user,
             date=date,
             amount=price,
-            desk_count=count
+            single_count=single_count,
+            group_count=group_count
         )
 
         return Response({'msg': 'done, reserved',
@@ -162,13 +180,13 @@ class ReserveDeskAPI(APIView):
 
 
 class CurrentUserReservationsAPI(APIView):
-    permission_classes = [IsAuthenticated, ]
-    serializer_class = ReserveSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReceiptSerializer
 
     def get(self, request):
-        reservation_obj = Reservation.objects.filter(user=request.user.id)
-        srz_data = self.serializer_class(reservation_obj, many=True)
-        return Response(srz_data.data)
+        reservation_obj = Income.objects.filter(user=request.user.id)
+        payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
+        return Response(payload)
 
 
 class GetSpecificDayReservationsAPI(APIView):
@@ -216,3 +234,25 @@ class GetMyReceipts(APIView):
         receipts = Income.objects.filter(user=user)
         srz_data = ReceiptSerializer(instance=receipts, many=True)
         return Response(srz_data.data)
+
+
+class Paginate(APIView):
+    def page(self, request, queryset, serializer):
+        page_number = request.data['page']
+        per_page = request.data['per_page']
+        # startswith = request.data['startswith']
+        paginator = Paginator(queryset, per_page)
+        page_range = list(paginator.get_elided_page_range(page_number, on_each_side=3))
+        page_obj = paginator.get_page(page_number)
+        # data = [{"name": kw} for kw in page_obj.object_list]
+        srz_data = serializer(instance=page_obj.object_list, many=True)
+
+        payload = {
+            "page": {
+                "current": page_obj.number,
+                "has_next": page_obj.has_next(),
+                "has_previous": page_obj.has_previous(),
+            },
+            "data": srz_data.data
+        }
+        return payload

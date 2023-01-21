@@ -51,5 +51,6 @@ class Quotes(models.Model):
 class Income(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=True, blank=True)
     date = models.DateField(null=True, blank=True)
-    desk_count = models.IntegerField(null=True, blank=True)
+    single_count = models.IntegerField(null=True, blank=True)
+    group_count = models.IntegerField(null=True, blank=True)
     amount = models.IntegerField(null=True, blank=True)
