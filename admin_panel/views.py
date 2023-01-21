@@ -217,7 +217,7 @@ class UserBanHistoryAPI(APIView):
     # permission_classes = [IsAuthenticated, ]
     serializer_class = BanSerializer
 
-    def get(self, request):
+    def post(self, request):
         user = request.data['user']
         ban_history = Ban.objects.filter(user=user)
         # srz_data = BanSerializer(instance=ban_history, many=True)
@@ -301,7 +301,7 @@ class GetAllReservesAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ReserveSerializer
 
-    def get(self, request):
+    def post(self, request):
         reserves = Reservation.objects.all()
         # srz_data = ReserveSerializer(instance=reserves, many=True)
         payload = Paginate.page(self, request, reserves, self.serializer_class)
