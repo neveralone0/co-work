@@ -491,28 +491,28 @@ class GetTodayReservesAPI(APIView):
 
         srz_data = self.serializer_class(instance=reservations, many=True)
         return Response(srz_data.data)
-
-
-class GetAllIncome(APIView):
-    serializer_class = IncomeSerializer
-
-    def post(self, request):
-        income = Income.objects.all()
-        srz_data = self.serializer_class(instance=income, many=True)
-        return Response(srz_data.data)
-
-
-class GetMonthIncome(APIView):
-    serializer_class = IncomeSerializer
-
-    def post(self, request):
-        date = datetime.date.today()
-        date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-
-        income = Income.objects.filter(date__month=date.month)
-        srz_data = self.serializer_class(instance=income, many=True)
-        return Response(srz_data.data)
+#
+#
+# class GetAllIncome(APIView):
+#     serializer_class = ReserveSerializer
+#
+#     def post(self, request):
+#         income = Reservation.objects.all()
+#         srz_data = self.serializer_class(instance=income, many=True)
+#         return Response(srz_data.data)
+#
+#
+# class GetMonthIncome(APIView):
+#     serializer_class = IncomeSerializer
+#
+#     def post(self, request):
+#         date = datetime.date.today()
+#         date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
+#         date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+#
+#         income = Income.objects.filter(date__month=date.month)
+#         srz_data = self.serializer_class(instance=income, many=True)
+#         return Response(srz_data.data)
 
 
 class RemoveUserAPI(APIView):

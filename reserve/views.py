@@ -6,9 +6,8 @@ from rest_framework.views import APIView, Response, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
-from .serializers import DeskSerializer, ReserveSerializer, ReceiptSerializer, FreeDeskSerializer
+from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer
 from accounting.permissions import IsNotBanned
-from admin_panel.models import Income
 import jalali_date
 
 
@@ -154,7 +153,8 @@ class ReserveDeskAPI(APIView):
                 user=user,
                 reservation_time=date,
                 desk=free_desks[0],
-                is_group=group
+                is_group=group,
+                price=free_desks[0].price,
             )
 
             if is_admin:
@@ -162,30 +162,22 @@ class ReserveDeskAPI(APIView):
             else:
                 payment = False
 
-        date = datetime.date.today()
-        date = jalali_date.date2jalali(date).strftime('%Y-%m-%d')
-        date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
-
-        Income.objects.create(
-            user=user,
-            date=date,
-            amount=price,
-            single_count=single_count,
-            group_count=group_count
-        )
-
         return Response({'msg': 'done, reserved',
                          'price': price,
                          'payment': payment})
 
 
-class CurrentUserReservationsAPI(APIView):
+class MyReservationsAPI(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = ReceiptSerializer
+    serializer_class = MyReserveSerializer
 
     def post(self, request):
-        reservation_obj = Income.objects.filter(user=request.user.id)
+        reservation_obj = Reservation.objects.filter(user=request.user.id)
+        print('====================')
+        print(reservation_obj)
         payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
+        print('====================')
+        print(payload)
         return Response(payload)
 
 
@@ -225,15 +217,15 @@ class GetDesks(APIView):
         return Response(srz_data.data)
 
 
-class GetMyReceipts(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        id = request.user.id
-        user = User.objects.get(id=id)
-        receipts = Income.objects.filter(user=user)
-        srz_data = ReceiptSerializer(instance=receipts, many=True)
-        return Response(srz_data.data)
+# class GetMyReceipts(APIView):
+#     permission_classes = [IsAuthenticated]
+#
+#     def get(self, request):
+#         id = request.user.id
+#         user = User.objects.get(id=id)
+#         receipts = Income.objects.filter(user=user)
+#         srz_data = ReceiptSerializer(instance=receipts, many=True)
+#         return Response(srz_data.data)
 
 
 class Paginate(APIView):

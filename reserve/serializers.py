@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Desk, Reservation
-from admin_panel.models import Income
 
 
 class FreeDeskSerializer(serializers.Serializer):
@@ -22,7 +21,11 @@ class ReserveSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ReceiptSerializer(serializers.ModelSerializer):
+class MyReserveSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Income
-        fields = '__all__'
+        model = Reservation
+        fields = ('reservation_time', 'order_time', 'price', 'is_group')
+    # reservation_time = serializers.DateField()
+    # order_time = serializers.DateField()
+    # price = serializers.IntegerField()
+    # is_group = serializers.BooleanField()

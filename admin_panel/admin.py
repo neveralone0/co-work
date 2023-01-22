@@ -5,4 +5,3 @@ from .models import *
 admin.site.register(Cards)
 admin.site.register(Images)
 admin.site.register(Ban)
-admin.site.register(Income)
