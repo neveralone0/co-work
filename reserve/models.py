@@ -1,5 +1,6 @@
 from django.db import models
 from accounting.models import User
+from django_jalali.db import models as jmodel
 
 
 class Desk(models.Model):
@@ -17,7 +18,7 @@ class Reservation(models.Model):
     is_group = models.BooleanField(default=False, null=True, blank=True)
     payment = models.BooleanField(default=False)
     reservation_time = models.DateField()
-    order_time = models.DateField(auto_now=True, null=True, blank=True)
+    order_time = jmodel.jDateField(auto_now=True, null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
 
     def __str__(self):

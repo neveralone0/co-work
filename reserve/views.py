@@ -149,6 +149,8 @@ class ReserveDeskAPI(APIView):
                                                reservation__reservation_time__month=date.month,
                                                reservation__reservation_time__day=date.day)
             free_desks = Desk.objects.exclude(pk__in=reservations)
+            print('=bug=============')
+            print(date)
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
