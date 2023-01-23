@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Desk, Reservation
+from django_jalali.serializers.serializerfield import JDateField
 
 
 class FreeDeskSerializer(serializers.Serializer):
@@ -22,6 +23,8 @@ class ReserveSerializer(serializers.ModelSerializer):
 
 
 class MyReserveSerializer(serializers.ModelSerializer):
+    reservation_time = JDateField()
+
     class Meta:
         model = Reservation
         fields = ('reservation_time', 'order_time', 'price', 'is_group')
