@@ -109,10 +109,18 @@ class ReserveDeskAPI(APIView):
                 pass
 
             try:
+                if data[key] == 'single':
+                    type = False
+                else:
+                    type = True
+                print(type)
+                print(not type)
                 reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                    reservation__reservation_time__month=date.month,
-                                                   reservation__reservation_time__day=date.day)
+                                                   reservation__reservation_time__day=date.day,
+                                                   is_group=type)
                 free_desks = Desk.objects.exclude(pk__in=reservations)
+                free_desks = free_desks.exclude(is_group=(not type))
                 if free_desks:
                     if data[key] == 'group':
                         group_count += 1
@@ -123,8 +131,8 @@ class ReserveDeskAPI(APIView):
                 else:
                     reserved_desks[key] = data[key]
                     reserve_status = True
-            except: pass
-
+            except Exception as e:
+                print(e)
 
         if reserve_status:
             print(reserve_status)
@@ -147,8 +155,6 @@ class ReserveDeskAPI(APIView):
                                                reservation__reservation_time__month=date.month,
                                                reservation__reservation_time__day=date.day)
             free_desks = Desk.objects.exclude(pk__in=reservations)
-            print('=bug=============')
-            print(date)
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,

@@ -32,6 +32,7 @@ urlpatterns = [
     path('delete-desk/', views.DeleteDeskAPI.as_view()),
     path('delete-desks/', views.DeskListDeleteAPI.as_view()),
 
+
     path('change-desk-price/', views.ChangeDeskPriceAPI.as_view()),
     path('change-multidesk-price/', views.ChangeMultiDesksPriceAPI.as_view()),
     path('change-alldesks-price/', views.ChangeAllDesksPriceAPI.as_view()),

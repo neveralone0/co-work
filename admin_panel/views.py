@@ -311,11 +311,8 @@ class GetAllReservesAPI(APIView):
 
     def post(self, request):
         reserves = Reservation.objects.all().order_by('reservation_time')
-        print('=HEREE==============')
-        print(reserves)
         # srz_data = ReserveSerializer(instance=reserves, many=True)
         payload = Paginate.page(self, request, reserves, self.serializer_class)
-        print('=2==============')
         return Response(payload)
 
 
