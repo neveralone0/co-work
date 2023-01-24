@@ -407,7 +407,7 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
-                "total": page_obj.last_page_index(),
+                "total": paginator.num_pages
             },
             "data": srz_data.data
         }
