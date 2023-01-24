@@ -302,9 +302,12 @@ class GetAllReservesAPI(APIView):
     serializer_class = ReserveSerializer
 
     def post(self, request):
-        reserves = Reservation.objects.all()
+        reserves = Reservation.objects.all().order_by('reservation_time')
+        print('=HEREE==============')
+        print(reserves)
         # srz_data = ReserveSerializer(instance=reserves, many=True)
         payload = Paginate.page(self, request, reserves, self.serializer_class)
+        print('=2==============')
         return Response(payload)
 
 
@@ -404,6 +407,7 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
+                "total": page_obj.last_page_index(),
             },
             "data": srz_data.data
         }

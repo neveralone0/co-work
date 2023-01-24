@@ -1,9 +1,7 @@
 import datetime
-
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.views import APIView, Response, status
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer
@@ -174,12 +172,8 @@ class MyReservationsAPI(APIView):
     serializer_class = MyReserveSerializer
 
     def post(self, request):
-        reservation_obj = Reservation.objects.filter(user=request.user.id)
-        print('====================')
-        print(reservation_obj)
+        reservation_obj = Reservation.objects.filter(user=request.user.id).order_by('reservation_time')
         payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
-        print('====================')
-        print(payload)
         return Response(payload)
 
 
@@ -246,6 +240,8 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
+                "total": page_obj.last_page_index()
+
             },
             "data": srz_data.data
         }

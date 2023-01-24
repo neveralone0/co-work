@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-
 from helpers.helpers import WORKING_CATEGORY
 from accounting import managers
 
