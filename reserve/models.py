@@ -7,9 +7,10 @@ class Desk(models.Model):
     active = models.BooleanField(default=True)
     price = models.PositiveIntegerField()
     id = models.IntegerField(unique=True, primary_key=True)
+    is_group = models.BooleanField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.id} - {self.is_group}'
 
 
 class Reservation(models.Model):

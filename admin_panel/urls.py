@@ -29,8 +29,9 @@ urlpatterns = [
 
     path('get-desk/<int:desk_id>/', views.GetSpecificDeskAPI.as_view()),
     path('create-desk/', views.CreateDeskAPI.as_view()),
-    path('delete-desk/<int:desk_id>/', views.DeleteDeskAPI.as_view()),
+    path('delete-desk/', views.DeleteDeskAPI.as_view()),
     path('delete-desks/', views.DeskListDeleteAPI.as_view()),
+
 
     path('change-desk-price/', views.ChangeDeskPriceAPI.as_view()),
     path('change-multidesk-price/', views.ChangeMultiDesksPriceAPI.as_view()),

@@ -1,9 +1,7 @@
 import datetime
-
 from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from rest_framework.views import APIView, Response, status
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer
@@ -111,10 +109,18 @@ class ReserveDeskAPI(APIView):
                 pass
 
             try:
+                if data[key] == 'single':
+                    type = False
+                else:
+                    type = True
+                print(type)
+                print(not type)
                 reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                    reservation__reservation_time__month=date.month,
-                                                   reservation__reservation_time__day=date.day)
+                                                   reservation__reservation_time__day=date.day,
+                                                   is_group=type)
                 free_desks = Desk.objects.exclude(pk__in=reservations)
+                free_desks = free_desks.exclude(is_group=(not type))
                 if free_desks:
                     if data[key] == 'group':
                         group_count += 1
@@ -125,8 +131,8 @@ class ReserveDeskAPI(APIView):
                 else:
                     reserved_desks[key] = data[key]
                     reserve_status = True
-            except: pass
-
+            except Exception as e:
+                print(e)
 
         if reserve_status:
             print(reserve_status)
@@ -149,8 +155,6 @@ class ReserveDeskAPI(APIView):
                                                reservation__reservation_time__month=date.month,
                                                reservation__reservation_time__day=date.day)
             free_desks = Desk.objects.exclude(pk__in=reservations)
-            print('=bug=============')
-            print(date)
             Reservation.objects.create(
                 user=user,
                 reservation_time=date,
@@ -174,12 +178,8 @@ class MyReservationsAPI(APIView):
     serializer_class = MyReserveSerializer
 
     def post(self, request):
-        reservation_obj = Reservation.objects.filter(user=request.user.id)
-        print('====================')
-        print(reservation_obj)
+        reservation_obj = Reservation.objects.filter(user=request.user.id).order_by('reservation_time')
         payload = Paginate.page(self, request, reservation_obj, self.serializer_class)
-        print('====================')
-        print(payload)
         return Response(payload)
 
 
@@ -246,6 +246,8 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
+                "total": paginator.num_pages
+
             },
             "data": srz_data.data
         }

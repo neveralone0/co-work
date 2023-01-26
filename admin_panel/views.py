@@ -262,11 +262,16 @@ class GetSpecificDeskAPI(APIView):
 
 class CreateDeskAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DeskSerializer
+    # serializer_class = DeskSerializer
 
     def post(self, request):
         srz_data = DeskSerializer(data=request.data)
         if srz_data.is_valid():
+            type = request.data['type']
+            if type == 'group':
+                srz_data.validated_data['is_group'] = True
+            elif type == 'single':
+                srz_data.validated_data['is_group'] = False
             srz_data.save()
             return Response({'msg': 'created'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -274,9 +279,12 @@ class CreateDeskAPI(APIView):
 
 class DeleteDeskAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
+    """
+    body{desk:int}
+    """
 
-    def delete(self, request, desk_id):
-        desk = Desk.objects.get(pk=desk_id)
+    def post(self, request):
+        desk = Desk.objects.get(pk=request.data['desk'])
         desk.delete()
         return Response({'msg': 'deleted'})
 
@@ -302,7 +310,7 @@ class GetAllReservesAPI(APIView):
     serializer_class = ReserveSerializer
 
     def post(self, request):
-        reserves = Reservation.objects.all()
+        reserves = Reservation.objects.all().order_by('reservation_time')
         # srz_data = ReserveSerializer(instance=reserves, many=True)
         payload = Paginate.page(self, request, reserves, self.serializer_class)
         return Response(payload)
@@ -404,6 +412,7 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
+                "total": paginator.num_pages
             },
             "data": srz_data.data
         }

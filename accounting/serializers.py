@@ -23,9 +23,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         pass
 
     def create(self, data):
-        # these lines used to fix a bug!
-        # print('=d==========')
-        # print(data)
         data['national_code'] = data['uni_code']
         del(data['uni_code'])
         # print(data)
