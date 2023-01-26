@@ -276,31 +276,36 @@ class CreateDeskAPI(APIView):
             return Response({'msg': 'created'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
+#
+# class DeleteDeskAPI(APIView):
+#     # permission_classes = [IsAuthenticated, IsAdminUser]
+#     """
+#     body{desk:int}
+#     """
+#
+#     def post(self, request):
+#         desk = Desk.objects.get(pk=request.data['desk'])
+#         desk.delete()
+#         return Response({'msg': 'deleted'})
 
-class DeleteDeskAPI(APIView):
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    """
-    body{desk:int}
-    """
 
-    def post(self, request):
-        desk = Desk.objects.get(pk=request.data['desk'])
-        desk.delete()
-        return Response({'msg': 'deleted'})
-
-
-class DeskListDeleteAPI(APIView):
+class DeskDeleteAPI(APIView):
     """
     body{\n
-    desks = (array of desk ids)
+    groups = int \n
+    singles = int \n
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
 
-    def delete(self, request):
-        desk_ids = request.data['desks']
-        desks = Desk.objects.filter(id__in=desk_ids)
-        for desk in desks:
+    def post(self, request):
+        groups = request.data['groups']
+        singles = request.data['singles']
+        single_desks = Desk.objects.all()[:int(singles)]
+        group_desks = Desk.objects.all()[:int(groups)]
+        for desk in single_desks:
+            desk.delete()
+        for desk in group_desks:
             desk.delete()
         return Response({'msg': 'desks deleted'})
 
