@@ -27,3 +27,7 @@ class UserFilter(django_filters.FilterSet):
         model = User
         fields = ('phone_number', 'national_code', 'full_name', 'join_date', 'working_category')
 
+
+class ReserveFilter(django_filters.FilterSet):
+    class Meta:
+        fields = '__all__'

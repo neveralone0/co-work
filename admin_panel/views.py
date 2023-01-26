@@ -8,7 +8,8 @@ from rest_framework import viewsets
 from accounting.serializers import UserSerializer
 from reserve.views import ReserveDeskAPI
 from reserve.models import Reservation, Desk
-from reserve.serializers import ReserveSerializer, DeskSerializer
+from accounting.serializers import UserListSerializer
+from reserve.serializers import ReserveSerializer, DeskSerializer, GetReserveSerializer
 from .serializers import *
 from .models import *
 from utils import UserFilter
@@ -276,18 +277,6 @@ class CreateDeskAPI(APIView):
             return Response({'msg': 'created'})
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-#
-# class DeleteDeskAPI(APIView):
-#     # permission_classes = [IsAuthenticated, IsAdminUser]
-#     """
-#     body{desk:int}
-#     """
-#
-#     def post(self, request):
-#         desk = Desk.objects.get(pk=request.data['desk'])
-#         desk.delete()
-#         return Response({'msg': 'deleted'})
-
 
 class DeskDeleteAPI(APIView):
     """
@@ -312,7 +301,7 @@ class DeskDeleteAPI(APIView):
 
 class GetAllReservesAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = ReserveSerializer
+    serializer_class = GetReserveSerializer
 
     def post(self, request):
         reserves = Reservation.objects.all().order_by('reservation_time')
@@ -446,7 +435,7 @@ class GetUserViaPhoneAPI(APIView):
 
 class GetUsersListAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
 
     def get(self, request):
         users = User.objects.all()

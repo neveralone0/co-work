@@ -3,6 +3,7 @@ import datetime
 import jalali_date
 from rest_framework import serializers
 from .models import Desk, Reservation
+from accounting.models import User
 from django_jalali.serializers.serializerfield import JDateField
 
 
@@ -23,6 +24,28 @@ class ReserveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = '__all__'
+
+
+class GetReserveSerializer(serializers.ModelSerializer):
+    full_name = serializers.SerializerMethodField('get_name')
+    national_code = serializers.SerializerMethodField('get_national_code')
+    phone_number = serializers.SerializerMethodField('get_phone_number')
+
+    def get_name(self, instance):
+        user = User.objects.get(id=instance.user.id)
+        return user.full_name
+
+    def get_national_code(self, instance):
+        user = User.objects.get(id=instance.user.id)
+        return user.national_code
+
+    def get_phone_number(self, instance):
+        user = User.objects.get(id=instance.user.id)
+        return user.phone_number
+
+    class Meta:
+        model = Reservation
+        fields = ('full_name', 'national_code', 'phone_number', 'is_group', 'reservation_time')
 
 
 class MyReserveSerializer(serializers.ModelSerializer):
