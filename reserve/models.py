@@ -15,7 +15,7 @@ class Desk(models.Model):
 
 class Reservation(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=True, blank=True)
-    desk = models.ForeignKey(to=Desk, on_delete=models.DO_NOTHING)
+    desk = models.ForeignKey(to=Desk, on_delete=models.SET_NULL, null=True, blank=True)
     is_group = models.BooleanField(default=False, null=True, blank=True)
     payment = models.BooleanField(default=False)
     reservation_time = models.DateField()

@@ -301,8 +301,8 @@ class DeskDeleteAPI(APIView):
     def post(self, request):
         groups = request.data['groups']
         singles = request.data['singles']
-        single_desks = Desk.objects.all()[:int(singles)]
-        group_desks = Desk.objects.all()[:int(groups)]
+        single_desks = Desk.objects.filter(is_group=False)[:int(singles)]
+        group_desks = Desk.objects.filter(is_group=True)[:int(groups)]
         for desk in single_desks:
             desk.delete()
         for desk in group_desks:
