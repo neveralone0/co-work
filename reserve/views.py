@@ -224,9 +224,11 @@ class GetDesks(APIView):
     serializer_class = DeskSerializer
 
     def get(self, request):
-        desk_list = Desk.objects.all()
-        srz_data = DeskSerializer(instance=desk_list, many=True)
-        return Response(srz_data.data)
+        g_desks = Desk.objects.filter(is_group=True)
+        s_desks = Desk.objects.filter(is_group=False)
+        g_srz_data = DeskSerializer(instance=g_desks, many=True)
+        s_srz_data = DeskSerializer(instance=s_desks, many=True)
+        return Response({'singles': s_srz_data.data, 'groups': g_srz_data.data})
 
 
 # class GetMyReceipts(APIView):
