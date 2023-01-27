@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView, Response, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
-from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer
+from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer, GetReserveSerializer
 from accounting.permissions import IsNotBanned
 from utils import ReserveFilter
 import jalali_date
@@ -197,7 +197,7 @@ class GetSpecificDayReservationsAPI(APIView):
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = ReserveSerializer
+    serializer_class = GetReserveSerializer
 
     def post(self, request):
         # date = request.data['date']

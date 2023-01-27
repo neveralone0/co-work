@@ -45,7 +45,8 @@ class GetReserveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = ('full_name', 'working_category', 'phone_number', 'is_group', 'reservation_time')
+        fields = ('id', 'full_name', 'working_category', 'phone_number',
+                  'is_group', 'reservation_time', 'order_time', 'price')
 
 
 class MyReserveSerializer(serializers.ModelSerializer):
