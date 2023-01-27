@@ -78,11 +78,13 @@
 # }
 
 DESIGN = 'ui-ux'
-PROGRAMMER = 'programmer'
+FRONT = 'front-end'
+PROGRAMMER = 'back-end'
 OTHER = 'other'
 
 WORKING_CATEGORY = (
-    (DESIGN, 'دیزاین و طراحی رابط کاربری'),
-    (PROGRAMMER, 'برنامه نویسی'),
+    (DESIGN, 'دیزاین'),
+    (FRONT, 'برنامه نویس Front-end'),
+    (PROGRAMMER, 'برنامه نویسی Back-end'),
     (OTHER, 'سایر'),
 )
