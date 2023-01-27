@@ -28,16 +28,16 @@ class ReserveSerializer(serializers.ModelSerializer):
 
 class GetReserveSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField('get_name')
-    national_code = serializers.SerializerMethodField('get_national_code')
+    working_category = serializers.SerializerMethodField('get_work_category')
     phone_number = serializers.SerializerMethodField('get_phone_number')
 
     def get_name(self, instance):
         user = User.objects.get(id=instance.user.id)
         return user.full_name
 
-    def get_national_code(self, instance):
+    def get_work_category(self, instance):
         user = User.objects.get(id=instance.user.id)
-        return user.national_code
+        return user.working_category
 
     def get_phone_number(self, instance):
         user = User.objects.get(id=instance.user.id)
@@ -45,7 +45,7 @@ class GetReserveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = ('full_name', 'national_code', 'phone_number', 'is_group', 'reservation_time')
+        fields = ('full_name', 'working_category', 'phone_number', 'is_group', 'reservation_time')
 
 
 class MyReserveSerializer(serializers.ModelSerializer):
