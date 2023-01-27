@@ -154,11 +154,12 @@ class UpdateUserInfo(APIView):
 
     def post(self, request):
         user = User.objects.get(pk=request.user.id)
-        srz_data = self.serializer_class(data=request.data)
+        srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
             srz_data.update(instance=user, validated_data=srz_data.validated_data)
             return Response({'msg': 'updated'})
-
+        print('+++++++++++++++++++++++')
+        print(srz_data.errors)
 
 class TempUpdateUser(APIView):
     permission_classes = [IsAuthenticated]
