@@ -9,7 +9,8 @@ from rest_framework import viewsets, generics, status
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import User, OtpCode
 from utils import send_otp_code
-from accounting.serializers import UserRegisterSerializer, UserSerializer, MiniUserRegisterSerializer
+from accounting.serializers import UserRegisterSerializer, UserSerializer, \
+    MiniUserRegisterSerializer, UserUpdateSerializer
 from accounting.permissions import IsAdminOrReadOnly, IsNotBanned
 from helpers.helpers import WORKING_CATEGORY
 import datetime
@@ -147,25 +148,16 @@ class VerifyOtpCodeAPI(APIView):
     #     return Response({'message': 'logged in', 'phone': phone_number.phone_number})
 
 
-class UpdateUserInfo(viewsets.ModelViewSet):
-    serializer_class = UserSerializer
-    # permission_classes = [IsAuthenticated, IsNotBanned]
-    parser_classes = [JSONParser, MultiPartParser]
+class UpdateUserInfo(APIView):
+    serializer_class = UserUpdateSerializer
+    permission_classes = [IsAuthenticated, IsNotBanned]
 
-    def get_queryset(self):
-        # user = self.request.user.phone_number
-        # user = '09111140'
-        q = User.objects.get(phone_number='09111140')
-        return q
-
-    def update(self, request, *args, **kwargs):
-        partial = True
-        instance = self.get_object()
-        serializer = self.get_serializer()
-        serializer.is_valid(raise_excpection=True)
-        self.perform_update(serializer)
-
-        return Response(serializer.data)
+    def post(self, request):
+        user = User.objects.get(pk=request.user.id)
+        srz_data = self.serializer_class(data=request.data)
+        if srz_data.is_valid():
+            srz_data.update(instance=user, validated_data=srz_data.validated_data)
+            return Response({'msg': 'updated'})
 
 
 class TempUpdateUser(APIView):
