@@ -59,7 +59,7 @@ class GetFreeDesks(APIView):
             if not free_desks_group:
                 full_days_group = data[d]
 
-        if not full_days_single and full_days_group:
+        if not full_days_single and not full_days_group:
             return Response({'msg': True})
         else:
             return Response({'msg': False,

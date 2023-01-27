@@ -348,16 +348,22 @@ class ChangeMultiDesksPriceAPI(APIView):
 class ChangeAllDesksPriceAPI(APIView):
     """
     body{\n
-    price
+    single_price=int \n
+    group_price=int
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
 
     def post(self, request):
-        desk_list = Desk.objects.all()
-        price = request.data['price']
-        for desk in desk_list:
-            desk.price = price
+        g_desks = Desk.objects.filter(is_group=True)
+        s_desks = Desk.objects.filter(is_group=False)
+        g_price = request.data['group_price']
+        s_price = request.data['single_price']
+        for desk in g_desks:
+            desk.price = g_price
+            desk.save()
+        for desk in s_desks:
+            desk.price = s_price
             desk.save()
         return Response({'msg': 'done'})
 
