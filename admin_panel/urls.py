@@ -1,5 +1,6 @@
 from django.urls import path, include
 from admin_panel import views
+from reserve.views import GetSpecificDayReservationsAPI
 from rest_framework.routers import DefaultRouter
 
 
@@ -7,7 +8,6 @@ router = DefaultRouter()
 router.register('image', views.MyModelViewSet, basename='imageee')
 
 app_name = 'admin'
-
 urlpatterns = [
     path('', include(router.urls)),
     path('get-all-images/', views.GetAllImage.as_view()),
@@ -42,6 +42,7 @@ urlpatterns = [
 
     path('all-reservations/', views.GetAllReservesAPI.as_view()),
     path('get-reservations-via-date/', views.GetTodayReservesAPI.as_view()),
+    path('get-reservations/', GetSpecificDayReservationsAPI.as_view()),
 
 
     path('get-all-users/', views.GetUsersListAPI.as_view()),
@@ -55,5 +56,6 @@ urlpatterns = [
 
     path('remove-user/', views.RemoveUserAPI.as_view()),
 ]
+
 
 # urlpatterns += router.urls

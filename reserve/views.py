@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer
 from accounting.permissions import IsNotBanned
+from utils import ReserveFilter
 import jalali_date
 
 
@@ -43,22 +44,27 @@ class GetFreeDesks(APIView):
 
     def post(self, request, is_admin=False):
         data = request.data
-        full_days = list()
+        full_days_single = list()
+        full_days_group = list()
         for d in data:
             date = datetime.datetime.strptime(data[d], "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
                                                reservation__reservation_time__month=date.month,
                                                reservation__reservation_time__day=date.day)
 
-            free_desks = Desk.objects.exclude(pk__in=reservations)
-            if not free_desks:
-                full_days = data[d]
+            free_desks_single = Desk.objects.exclude(pk__in=reservations, is_group=True)
+            free_desks_group = Desk.objects.exclude(pk__in=reservations, is_group=False)
+            if not free_desks_single:
+                full_days_single = data[d]
+            if not free_desks_group:
+                full_days_group = data[d]
 
-        if not full_days:
+        if not full_days_single and full_days_group:
             return Response({'msg': True})
         else:
             return Response({'msg': False,
-                             'full_days': full_days})
+                             'full_days_group': full_days_group,
+                             'full_days_single': full_days_single})
 
 
 class ReserveDeskAPI(APIView):
@@ -67,6 +73,7 @@ class ReserveDeskAPI(APIView):
     {1401-01-01: 12},{1401-01-02: 12}
     }
     """
+
     # permission_classes = [IsAuthenticated, IsNotBanned]
     # serializer_class = ReserveSerializer
 
@@ -140,10 +147,10 @@ class ReserveDeskAPI(APIView):
             return Response({'msg': 'these dates are full',
                              'dates': reserved_desks})
         print('we r not here')
-        if (single_count+group_count) >= 20:
-            price -= 5 * (single_count+group_count)
-        elif (single_count+group_count) >= 10:
-            price -= 3 * (single_count+group_count)
+        if (single_count + group_count) >= 20:
+            price -= 5 * (single_count + group_count)
+        elif (single_count + group_count) >= 10:
+            price -= 3 * (single_count + group_count)
 
         for key in data:
             if data[key] == 'group':
@@ -189,14 +196,17 @@ class GetSpecificDayReservationsAPI(APIView):
     date = 1401-1-1
     }
     """
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = ReserveSerializer
 
     def post(self, request):
-        date = request.data['date']
-        reservations = Reservation.objects.filter(reservation_time=date)
-        srz_data = ReserveSerializer(instance=reservations, many=True)
-        return Response(srz_data.data)
+        # date = request.data['date']
+        reservations = Reservation.objects.all()
+        filter = ReserveFilter(request.data, reservations)
+        # reservations = Reservation.objects.filter(reservation_time=date)
+        # srz_data = ReserveSerializer(instance=filter.qs, many=True)
+        payload = Paginate.page(self, request, filter.qs, self.serializer_class)
+        return Response(payload)
 
 
 class Check(APIView):
@@ -214,9 +224,11 @@ class GetDesks(APIView):
     serializer_class = DeskSerializer
 
     def get(self, request):
-        desk_list = Desk.objects.all()
-        srz_data = DeskSerializer(instance=desk_list, many=True)
-        return Response(srz_data.data)
+        g_desks = Desk.objects.filter(is_group=True)
+        s_desks = Desk.objects.filter(is_group=False)
+        g_srz_data = DeskSerializer(instance=g_desks, many=True)
+        s_srz_data = DeskSerializer(instance=s_desks, many=True)
+        return Response({'singles': s_srz_data.data, 'groups': g_srz_data.data})
 
 
 # class GetMyReceipts(APIView):

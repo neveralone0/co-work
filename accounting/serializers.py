@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from accounting.models import User
+from admin_panel.models import Ban
 
 
 class MiniUserRegisterSerializer(serializers.Serializer):
@@ -51,3 +52,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    ban_status = serializers.SerializerMethodField('ban_check')
+
+    def ban_check(self, instance):
+        user = User.objects.get(phone_number=instance.phone_number)
+        try:
+            ban = Ban.objects.get(user=user, status=True)
+            return True
+        except:
+            return False
+
+    class Meta:
+        model = User
+        fields = ('full_name', 'phone_number', 'working_category', 'ban_status', 'national_code')
