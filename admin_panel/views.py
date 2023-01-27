@@ -437,7 +437,7 @@ class GetUsersListAPI(APIView):
     # permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = UserListSerializer
 
-    def get(self, request):
+    def post(self, request):
         users = User.objects.all()
         filter = UserFilter(request.data, queryset=users)
         # srz_data = UserSerializer(instance=filter.qs, many=True)
