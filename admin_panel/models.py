@@ -38,7 +38,7 @@ class ContactUs(models.Model):
 
 class Ban(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='bans')
-    end = models.DateTimeField(auto_now=True)
+    end = models.DateField()
     status = models.BooleanField(default=True)
     reason = models.CharField(max_length=255)
 

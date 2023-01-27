@@ -160,7 +160,8 @@ class MyModelViewSet(viewsets.ModelViewSet):
 class BanUserAPI(APIView):
     """
     body{\n
-    user = (user id)
+    user = (user id) \n
+    reason = string
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
@@ -179,7 +180,8 @@ class BanUserAPI(APIView):
                 return Response({'msg': 'user not found!'}, status=status.HTTP_400_BAD_REQUEST)
             srz_data.create(validated_data=srz_data.validated_data)
             return Response({'msg': 'user banned'})
-
+        print('=er====')
+        return Response(srz_data.errors)
 
 class UnbanUserAPI(APIView):
     """
