@@ -83,7 +83,7 @@ PROGRAMMER = 'back-end'
 OTHER = 'other'
 
 WORKING_CATEGORY = (
-    (DESIGN, 'دیزاین'),
+    (DESIGN, 'ui/ux'),
     (FRONT, 'برنامه نویس Front-end'),
     (PROGRAMMER, 'برنامه نویسی Back-end'),
     (OTHER, 'سایر'),
