@@ -77,14 +77,14 @@
 #     ADMIN: 'AdminProfile',
 # }
 
-DESIGN = 'ui-ux'
-FRONT = 'front-end'
-PROGRAMMER = 'back-end'
+DESIGN = 'UI/UX'
+FRONT = 'Front-end'
+PROGRAMMER = 'Back-end'
 OTHER = 'other'
 
 WORKING_CATEGORY = (
     (DESIGN, 'UI/UX'),
-    (FRONT, 'برنامه نویس Front-end'),
-    (PROGRAMMER, 'برنامه نویسی Back-end'),
-    (OTHER, 'سایر'),
+    (FRONT, 'Front-end'),
+    (PROGRAMMER, 'Back-end'),
+    (OTHER, 'other'),
 )
