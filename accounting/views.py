@@ -158,7 +158,8 @@ class UpdateUserInfo(APIView):
         if srz_data.is_valid():
             srz_data.update(instance=user, validated_data=srz_data.validated_data)
             return Response({'msg': 'updated'})
-
+        print('+++++++++++++++++++++++')
+        print(srz_data.errors)
 
 class TempUpdateUser(APIView):
     permission_classes = [IsAuthenticated]
