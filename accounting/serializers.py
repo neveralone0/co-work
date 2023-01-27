@@ -54,6 +54,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('national_code', 'full_name', 'birth_date', 'working_category')
+
+
 class UserListSerializer(serializers.ModelSerializer):
     ban_status = serializers.SerializerMethodField('ban_check')
 
