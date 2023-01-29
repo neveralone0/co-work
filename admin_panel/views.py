@@ -167,7 +167,7 @@ class BanUserAPI(APIView):
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = BanSerializer
+    serializer_class = BanCreateSerializer
 
     def post(self, request):
         srz_data = BanSerializer(data=request.data)
@@ -180,7 +180,7 @@ class BanUserAPI(APIView):
             except Exception as e:
                 print(e)
                 return Response({'msg': 'user not found!'}, status=status.HTTP_400_BAD_REQUEST)
-            date = srz_data.validated_data.pop('ending')
+            date = int(srz_data.validated_data.pop('ending'))
             today = datetime.date.today()
             today = jalali_date.date2jalali(today)
             ban_end = today + timedelta(days=date)
