@@ -1,6 +1,8 @@
 from django.db import models
 from core.settings import BASE_DIR
 from accounting.models import User
+from django_jalali.db import models as jmodels
+
 
 
 def upload_to(instance, filename):
@@ -38,7 +40,7 @@ class ContactUs(models.Model):
 
 class Ban(models.Model):
     user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='bans')
-    end = models.DateField()
+    end = jmodels.jDateField(null=True, blank=True)
     status = models.BooleanField(default=True)
     reason = models.CharField(max_length=255)
 
