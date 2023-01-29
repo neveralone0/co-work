@@ -156,10 +156,23 @@ class UpdateUserInfo(APIView):
         user = User.objects.get(pk=request.user.id)
         srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
+            if srz_data.validated_data['national_code']:
+                try:
+                    users = User.objects.filter(national_code=srz_data.validated_data['national_code'], )
+                    if users:
+                        for user in users:
+                            if user.phone_number == request.user.phone_number:
+                                pass
+                            else:
+                                return Response({'msg': 'national code exists'})
+                except: pass
+            print('====================')
+            print(srz_data.validated_data)
             srz_data.update(instance=user, validated_data=srz_data.validated_data)
             return Response({'msg': 'updated'})
         print('+++++++++++++++++++++++')
         print(srz_data.errors)
+
 
 class TempUpdateUser(APIView):
     permission_classes = [IsAuthenticated]

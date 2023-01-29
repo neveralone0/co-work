@@ -7,7 +7,7 @@ from accounting import managers
 class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True, null=False)
     phone_number_validation = models.BooleanField(default=False)
-    national_code = models.IntegerField(unique=True, null=True, blank=True)
+    national_code = models.IntegerField(null=True, blank=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     full_name = models.CharField(max_length=32, null=True, blank=True)
