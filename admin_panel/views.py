@@ -1,6 +1,7 @@
 import datetime
 import jalali_date
 from django.core.paginator import Paginator
+from jdatetime import timedelta
 from rest_framework.views import APIView, Response, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser, FileUploadParser
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
@@ -161,11 +162,12 @@ class BanUserAPI(APIView):
     """
     body{\n
     user = (user id) \n
-    reason = string
+    reason = string \n
+    endong = int
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = BanSerializer
+    serializer_class = BanCreateSerializer
 
     def post(self, request):
         srz_data = BanSerializer(data=request.data)
@@ -178,10 +180,20 @@ class BanUserAPI(APIView):
             except Exception as e:
                 print(e)
                 return Response({'msg': 'user not found!'}, status=status.HTTP_400_BAD_REQUEST)
+            date = int(srz_data.validated_data.pop('ending'))
+            today = datetime.date.today()
+            today = jalali_date.date2jalali(today)
+            ban_end = today + timedelta(days=date)
+            srz_data.validated_data['end'] = ban_end
+            # srz_data.validated_data['ending']
+            print('+_+_+_+_+')
+            # print(srz_data.validated_data['end'])
             srz_data.create(validated_data=srz_data.validated_data)
+
             return Response({'msg': 'user banned'})
         print('=er====')
         return Response(srz_data.errors)
+
 
 class UnbanUserAPI(APIView):
     """
@@ -194,6 +206,8 @@ class UnbanUserAPI(APIView):
     def post(self, request):
         user = request.data['user']
         ban_objects = Ban.objects.filter(user=user, status=True)
+        if not ban_objects:
+            return Response({'msg': 'user is not banned!'})
         for obj in ban_objects:
             obj.status = False
             obj.save()
