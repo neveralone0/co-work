@@ -110,6 +110,12 @@ class OrderVerifyAPI(APIView):
 
 
 class GetIncome(APIView):
+    """
+    body{\n
+    start=date \n
+    end=date \n
+    }
+    """
     serializer_class = ReserveSerializer
 
     def post(self, request):
