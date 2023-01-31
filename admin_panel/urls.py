@@ -16,9 +16,9 @@ urlpatterns = [
     path('list-delete-image/', views.ListDeleteImages.as_view()),
 
     path('contact-us/', views.ContactUsAPI.as_view()),
-
     path('card/', views.CardAPI.as_view()),
-
+    path('close-day/', views.CloseDay.as_view()),
+    path('rm-close-day/', views.RemoveCloseDay.as_view()),
     path('policy/', views.PolicyAPI.as_view()),
 
     path('ban-user/', views.BanUserAPI.as_view()),

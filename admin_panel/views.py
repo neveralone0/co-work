@@ -100,6 +100,8 @@ class ContactUsAPI(APIView):
             else:
                 srz_data.create(validated_data=srz_data.validated_data)
             return Response({'msg': 'information updated'})
+        print('=errors============')
+        print(srz_data.errors)
 
 
 class PolicyAPI(APIView):
@@ -122,6 +124,43 @@ class PolicyAPI(APIView):
             else:
                 srz_data.create(validated_data=srz_data.validated_data)
             return Response({'msg': 'information updated'})
+
+
+class CloseDay(APIView):
+    serializer_class = CloseDaySerializer
+
+    def get(self, request):
+        days = CloseDays.objects.all()
+        payload = Paginate.page(self, request, days, self.serializer_class)
+        return Response(payload)
+
+    def post(self, request):
+        dates = dict()
+        for i in request.data['day']:
+            print('===')
+            print(i)
+            # dates.append(jalali_date.date2jalali(i).strftime('%Y-%m-%d'))
+            i = datetime.datetime.strptime(i, "%Y-%m-%d").date()
+            dates['days'].append(i)
+        print('=d===')
+        print(dates)
+        srz_data = self.serializer_class(data=dates)
+        if srz_data.is_valid():
+            srz_data.save()
+            return Response({'msg': 'closed'})
+        print('==========')
+        print(srz_data.errors)
+
+
+class RemoveCloseDay(APIView):
+    def post(self, request):
+        ids = request.data['ids']
+        days = CloseDays.objects.all()
+        for day in days:
+            for id in ids:
+                if day.id == int(id):
+                    day.delete()
+        return Response({'msg': 'days opened'})
 
 
 class CardAPI(APIView):
