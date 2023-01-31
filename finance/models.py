@@ -3,13 +3,13 @@ from django.db import models
 from accounting.models import User
 
 
-class Bill(models.Model):
-    price = models.PositiveIntegerField()
-    user = models.OneToOneField(to=User, on_delete=models.DO_NOTHING)
-    date = models.DateTimeField(auto_now=True)
-    is_payed = models.BooleanField(default=False)
-    discount = models.IntegerField(blank=True, null=True, default=None)
-
+# class Bill(models.Model):
+#     price = models.PositiveIntegerField()
+#     user = models.OneToOneField(to=User, on_delete=models.DO_NOTHING)
+#     date = models.DateTimeField(auto_now=True)
+#     is_payed = models.BooleanField(default=False)
+#     discount = models.IntegerField(blank=True, null=True, default=None)
+#
 
 class Coupon(models.Model):
     code = models.CharField(max_length=30, unique=True)
@@ -20,3 +20,4 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+

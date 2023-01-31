@@ -168,6 +168,7 @@ class ReserveDeskAPI(APIView):
                 desk=free_desks[0],
                 is_group=group,
                 price=free_desks[0].price,
+                order_time=now
             )
 
             if is_admin:
