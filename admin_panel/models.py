@@ -27,6 +27,13 @@ class Cards(models.Model):
 #     card = models.ForeignKey(to=Cards, on_delete=models.CASCADE, related_name='lis', null=True, blank=True)
 
 
+class CloseDays(models.Model):
+    day = models.DateField()
+
+    def __str__(self):
+        return f'{self.day} - {self.id}'
+
+
 class ContactUs(models.Model):
     address = models.CharField(max_length=512)
     work_time = models.CharField(max_length=256)

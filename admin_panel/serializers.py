@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cards, Images, ContactUs, Ban, Quotes, Policy
+from .models import Cards, Images, ContactUs, Ban, Quotes, Policy, CloseDays
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 
 
@@ -60,4 +60,10 @@ class QuoteSerializer(serializers.ModelSerializer):
 class PolicySerializer(serializers.ModelSerializer):
     class Meta:
         model = Policy
+        fields = '__all__'
+
+
+class CloseDaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CloseDays
         fields = '__all__'
