@@ -80,21 +80,47 @@ class ListDeleteImages(APIView):
         return Response({'msg': 'deleted'})
 
 
-class ContactUsGet(APIView):
+class ContactUsAPI(APIView):
     serializer_class = ContactUsSerializer
 
     def get(self, request):
-        info = ContactUs.objects.get(pk=1)
-        srz_data = self.serializer_class(instance=info)
+        info = ContactUs.objects.filter()
+        try:
+            srz_data = self.serializer_class(instance=info[0])
+        except:
+            return Response({'msg': 'please create contact us first'})
         return Response(srz_data.data)
 
-
-class ContactUsUpdate(APIView):
     def post(self, request):
-        info = ContactUs.objects.get(pk=1)
-        srz_data = self.serializer_class(data=request.data, instance=info)
+        info = ContactUs.objects.filter()
+        srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
-            srz_data.save()
+            if len(info) == 1:
+                srz_data.update(instance=info[0], validated_data=srz_data.validated_data)
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
+            return Response({'msg': 'information updated'})
+
+
+class PolicyAPI(APIView):
+    serializer_class = PolicySerializer
+
+    def get(self, request):
+        obj = Policy.objects.filter()
+        try:
+            srz_data = self.serializer_class(instance=obj[0])
+        except:
+            return Response({'msg': 'please create policy first'})
+        return Response(srz_data.data)
+
+    def post(self, request):
+        policy = Policy.objects.filter()
+        srz_data = self.serializer_class(data=request.data, partial=True)
+        if srz_data.is_valid():
+            if len(policy) == 1:
+                srz_data.update(instance=policy[0], validated_data=srz_data.validated_data)
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
             return Response({'msg': 'information updated'})
 
 
@@ -111,40 +137,24 @@ class CardAPI(APIView):
         body{\n
         }
         """
-        for card in request.data:
-            obj = Cards.objects.get(id=card['id'])
-            srz_data = self.serializer_class(data=card, instance=obj)
-            if srz_data.is_valid():
-                srz_data.save()
-            return Response({'msg': 'cards updated'})
+        card_a = request.data['card1']
+        card_b = request.data['card2']
+        cards = Cards.objects.filter()
+        srz_data = self.serializer_class(data=card_a, partial=True)
+        if srz_data.is_valid():
+            if len(cards) == 1:
+                srz_data.update(validated_data=srz_data.validated_data, instance=cards[0])
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
 
+        srz_data2 = self.serializer_class(data=card_b, partial=True)
+        if srz_data2.is_valid():
+            if len(cards) == 2:
+                srz_data2.update(validated_data=srz_data2.validated_data, instance=cards[1])
+            else:
+                srz_data2.create(validated_data=srz_data.validated_data)
 
-# class AddLi(APIView):
-#     serializer_class = LiSerializer
-#
-#     def post(self, request):
-#         srz_data = self.serializer_class(data=request.data)
-#         if srz_data.is_valid():
-#             srz_data.save()
-#             return Response({'msg': 'li added'})
-
-#
-# class UpdateLi(APIView):
-#     serializer_class = LiSerializer
-#
-#     def put(self, request, pk):
-#         lis = Li.objects.get(pk=pk)
-#         srz_data = self.serializer_class(instance=lis, data=request.data, many=True)
-#         if srz_data.is_valid():
-#             srz_data.save()
-#             return Response({'msg': 'li updated'})
-#
-#
-# class DeleteLi(APIView):
-#     def delete(self, request, pk):
-#         li = Li.objects.get(pk=pk)
-#         li.delete()
-#         return Response({'msg': 'li deleted'})
+        return Response({'msg': 'cards updated'})
 
 
 class MyModelViewSet(viewsets.ModelViewSet):

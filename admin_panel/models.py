@@ -48,3 +48,7 @@ class Ban(models.Model):
 class Quotes(models.Model):
     title = models.CharField(max_length=64, null=True, blank=True)
     body = models.CharField(max_length=256, null=True, blank=True)
+
+
+class Policy(models.Model):
+    text = models.CharField(max_length=10000)

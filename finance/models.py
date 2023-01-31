@@ -21,3 +21,10 @@ class Coupon(models.Model):
     def __str__(self):
         return self.code
 
+
+class Income(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.SET_NULL, null=True, blank=True)
+    is_group = models.BooleanField()
+    desk_count = models.IntegerField()
+    order_time = models.DateField()
+    price = models.IntegerField()

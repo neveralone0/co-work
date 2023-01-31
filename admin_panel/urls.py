@@ -15,10 +15,11 @@ urlpatterns = [
     path('delete-image/', views.DeleteImage.as_view()),
     path('list-delete-image/', views.ListDeleteImages.as_view()),
 
-    path('contactus/', views.ContactUsGet.as_view()),
-    path('contactus-update/', views.ContactUsUpdate.as_view()),
+    path('contact-us/', views.ContactUsAPI.as_view()),
 
     path('card/', views.CardAPI.as_view()),
+
+    path('policy/', views.PolicyAPI.as_view()),
 
     path('ban-user/', views.BanUserAPI.as_view()),
     path('unban-user/', views.UnbanUserAPI.as_view()),
@@ -29,7 +30,6 @@ urlpatterns = [
 
     path('get-desk/<int:desk_id>/', views.GetSpecificDeskAPI.as_view()),
     path('create-desk/', views.CreateDeskAPI.as_view()),
-    # path('delete-desk/', views.DeleteDeskAPI.as_view()),
     path('delete-desks/', views.DeskDeleteAPI.as_view()),
 
 
@@ -50,9 +50,6 @@ urlpatterns = [
 
     path('get-quotes/', views.GetQuotes.as_view()),
     path('update-quotes/', views.UpdateQuotes.as_view()),
-    #
-    # path('get-all-income/', views.GetAllIncome.as_view()),
-    # path('get-month-income/', views.GetMonthIncome.as_view()),
 
     path('remove-user/', views.RemoveUserAPI.as_view()),
 ]
