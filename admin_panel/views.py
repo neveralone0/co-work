@@ -80,21 +80,25 @@ class ListDeleteImages(APIView):
         return Response({'msg': 'deleted'})
 
 
-class ContactUsGet(APIView):
+class ContactUsAPI(APIView):
     serializer_class = ContactUsSerializer
 
     def get(self, request):
-        info = ContactUs.objects.get(pk=1)
-        srz_data = self.serializer_class(instance=info)
+        info = ContactUs.objects.filter()
+        try:
+            srz_data = self.serializer_class(instance=info[0])
+        except:
+            return Response({'msg': 'please create contact us first'})
         return Response(srz_data.data)
 
-
-class ContactUsUpdate(APIView):
     def post(self, request):
-        info = ContactUs.objects.get(pk=1)
-        srz_data = self.serializer_class(data=request.data, instance=info)
+        info = ContactUs.objects.filter()
+        srz_data = self.serializer_class(data=request.data, partial=True)
         if srz_data.is_valid():
-            srz_data.save()
+            if len(info) == 1:
+                srz_data.update(instance=info[0], validated_data=srz_data.validated_data)
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
             return Response({'msg': 'information updated'})
 
 
