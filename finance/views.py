@@ -3,6 +3,7 @@ import requests
 import json
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.db.models import Sum
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response, status
 from reserve.models import Reservation
@@ -124,5 +125,7 @@ class GetIncome(APIView):
         print(end)
         print(type(end))
         incomes = Reservation.objects.filter(order_time__range=[start, end])
+        sum_income = incomes.aggregate(Sum('price'))
         payload = Paginate.page(self, request, incomes, self.serializer_class)
+        payload['all_income'] = sum_income
         return Response(payload)
