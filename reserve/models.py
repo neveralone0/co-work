@@ -19,8 +19,8 @@ class Reservation(models.Model):
     is_group = models.BooleanField(default=False, null=True, blank=True)
     payment = models.BooleanField(default=False)
     reservation_time = models.DateField()
-    order_time = jmodel.jDateField(auto_now=True, null=True, blank=True)
+    order_time = models.DateField(null=True, blank=True)
     price = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.desk.id} - {self.payment}'
+        return f' - {self.payment} - {self.order_time}'
