@@ -28,6 +28,8 @@ class ImageSerializer(serializers.ModelSerializer):
 
 
 class ContactUsSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=False)
+
     class Meta:
         model = ContactUs
         fields = '__all__'
