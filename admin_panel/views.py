@@ -102,6 +102,28 @@ class ContactUsAPI(APIView):
             return Response({'msg': 'information updated'})
 
 
+class PolicyAPI(APIView):
+    serializer_class = PolicySerializer
+
+    def get(self, request):
+        obj = Policy.objects.filter()
+        try:
+            srz_data = self.serializer_class(instance=obj[0])
+        except:
+            return Response({'msg': 'please create policy first'})
+        return Response(srz_data.data)
+
+    def post(self, request):
+        policy = Policy.objects.filter()
+        srz_data = self.serializer_class(data=request.data, partial=True)
+        if srz_data.is_valid():
+            if len(policy) == 1:
+                srz_data.update(instance=policy[0], validated_data=srz_data.validated_data)
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
+            return Response({'msg': 'information updated'})
+
+
 class CardAPI(APIView):
     serializer_class = CardSerializer
 
