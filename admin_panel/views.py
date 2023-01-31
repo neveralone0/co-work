@@ -111,12 +111,24 @@ class CardAPI(APIView):
         body{\n
         }
         """
-        for card in request.data:
-            obj = Cards.objects.get(id=card['id'])
-            srz_data = self.serializer_class(data=card, instance=obj)
-            if srz_data.is_valid():
-                srz_data.save()
-            return Response({'msg': 'cards updated'})
+        card_a = request.data['card1']
+        card_b = request.data['card2']
+        cards = Cards.objects.filter()
+        srz_data = self.serializer_class(data=card_a, partial=True)
+        if srz_data.is_valid():
+            if len(cards) == 1:
+                srz_data.update(validated_data=srz_data.validated_data, instance=cards[0])
+            else:
+                srz_data.create(validated_data=srz_data.validated_data)
+
+        srz_data2 = self.serializer_class(data=card_b, partial=True)
+        if srz_data2.is_valid():
+            if len(cards) == 2:
+                srz_data2.update(validated_data=srz_data2.validated_data, instance=cards[1])
+            else:
+                srz_data2.create(validated_data=srz_data.validated_data)
+
+        return Response({'msg': 'cards updated'})
 
 
 # class AddLi(APIView):

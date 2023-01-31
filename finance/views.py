@@ -122,8 +122,6 @@ class GetIncome(APIView):
     def post(self, request):
         start = str(request.data['start'])
         end = str(request.data['end'])
-        print(end)
-        print(type(end))
         incomes = Reservation.objects.filter(order_time__range=[start, end])
         sum_income = incomes.aggregate(Sum('price'))
         payload = Paginate.page(self, request, incomes, self.serializer_class)
