@@ -6,8 +6,8 @@ from django.shortcuts import redirect
 from django.db.models import Sum
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView, Response, status
-from reserve.models import Reservation
-from .serializers import ReserveSerializer
+from .models import Income
+from .serializers import IncomeSerializer
 from reserve.views import Paginate
 # from reservation.seralizers import ReserveSerializer
 # from finance.models import Bill, Coupon
@@ -117,12 +117,12 @@ class GetIncome(APIView):
     end=date \n
     }
     """
-    serializer_class = ReserveSerializer
+    serializer_class = IncomeSerializer
 
     def post(self, request):
         start = str(request.data['start'])
         end = str(request.data['end'])
-        incomes = Reservation.objects.filter(order_time__range=[start, end])
+        incomes = Income.objects.filter(order_time__range=[start, end])
         sum_income = incomes.aggregate(Sum('price'))
         payload = Paginate.page(self, request, incomes, self.serializer_class)
         payload['all_income'] = sum_income

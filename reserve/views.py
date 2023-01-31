@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer, GetReserveSerializer
 from accounting.permissions import IsNotBanned
+from finance.models import Income
 from utils import ReserveFilter
 import jalali_date
 
@@ -171,10 +172,19 @@ class ReserveDeskAPI(APIView):
                 order_time=now
             )
 
+
             if is_admin:
                 payment = True
             else:
                 payment = False
+
+        Income.objects.create(
+            user=user,
+            is_group=group,
+            order_time=now,
+            desk_count=(single_count + group_count),
+            price=price
+        )
 
         return Response({'msg': 'done, reserved',
                          'price': price,

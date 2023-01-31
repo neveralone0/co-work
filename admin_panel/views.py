@@ -131,34 +131,6 @@ class CardAPI(APIView):
         return Response({'msg': 'cards updated'})
 
 
-# class AddLi(APIView):
-#     serializer_class = LiSerializer
-#
-#     def post(self, request):
-#         srz_data = self.serializer_class(data=request.data)
-#         if srz_data.is_valid():
-#             srz_data.save()
-#             return Response({'msg': 'li added'})
-
-#
-# class UpdateLi(APIView):
-#     serializer_class = LiSerializer
-#
-#     def put(self, request, pk):
-#         lis = Li.objects.get(pk=pk)
-#         srz_data = self.serializer_class(instance=lis, data=request.data, many=True)
-#         if srz_data.is_valid():
-#             srz_data.save()
-#             return Response({'msg': 'li updated'})
-#
-#
-# class DeleteLi(APIView):
-#     def delete(self, request, pk):
-#         li = Li.objects.get(pk=pk)
-#         li.delete()
-#         return Response({'msg': 'li deleted'})
-
-
 class MyModelViewSet(viewsets.ModelViewSet):
     queryset = Images.objects.all()
     serializer_class = ImageSerializer
