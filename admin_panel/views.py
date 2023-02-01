@@ -126,7 +126,7 @@ class PolicyAPI(APIView):
             return Response({'msg': 'information updated'})
 
 
-class CloseDay(APIView):
+class CloseDayAPI(APIView):
     serializer_class = CloseDaySerializer
 
     def get(self, request):
@@ -135,21 +135,24 @@ class CloseDay(APIView):
         return Response(payload)
 
     def post(self, request):
-        dates = dict()
-        for i in request.data['day']:
-            print('===')
-            print(i)
-            # dates.append(jalali_date.date2jalali(i).strftime('%Y-%m-%d'))
-            i = datetime.datetime.strptime(i, "%Y-%m-%d").date()
-            dates['days'].append(i)
-        print('=d===')
-        print(dates)
-        srz_data = self.serializer_class(data=dates)
-        if srz_data.is_valid():
-            srz_data.save()
-            return Response({'msg': 'closed'})
-        print('==========')
-        print(srz_data.errors)
+        flag = bool()
+        data = request.data
+        days_obj = CloseDays.objects.all()
+        for key in data:
+            day = data[key]
+            day = datetime.datetime.strptime(day, "%Y-%m-%d").date()
+            for obj in days_obj:
+                if obj.day == day:
+                    pass
+                else:
+                    flag = True
+            if not flag or not days_obj:
+                CloseDays.objects.create(day=day)
+                return Response({'msg': 'days closed'})
+            return Response({'msg': 'some days are currently closed!'})
+
+
+
 
 
 class RemoveCloseDay(APIView):

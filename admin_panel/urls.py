@@ -17,7 +17,7 @@ urlpatterns = [
 
     path('contact-us/', views.ContactUsAPI.as_view()),
     path('card/', views.CardAPI.as_view()),
-    path('close-day/', views.CloseDay.as_view()),
+    path('close-day/', views.CloseDayAPI.as_view()),
     path('rm-close-day/', views.RemoveCloseDay.as_view()),
     path('policy/', views.PolicyAPI.as_view()),
 
