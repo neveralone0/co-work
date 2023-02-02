@@ -369,16 +369,16 @@ class DeskDeleteAPI(APIView):
         return Response({'msg': 'desks deleted'})
 
 
-class GetAllReservesAPI(APIView):
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = GetReserveSerializer
-
-    def post(self, request):
-        reserves = Reservation.objects.all().order_by('reservation_time')
-        # srz_data = ReserveSerializer(instance=reserves, many=True)
-        payload = Paginate.page(self, request, reserves, self.serializer_class)
-        return Response(payload)
-
+# class GetAllReservesAPI(APIView):
+#     # permission_classes = [IsAuthenticated, IsAdminUser]
+#     serializer_class = GetReserveSerializer
+#
+#     def post(self, request):
+#         reserves = Reservation.objects.all().order_by('reservation_time')
+#         # srz_data = ReserveSerializer(instance=reserves, many=True)
+#         payload = Paginate.page(self, request, reserves, self.serializer_class)
+#         return Response(payload)
+#
 
 class ChangeDeskPriceAPI(APIView):
     """

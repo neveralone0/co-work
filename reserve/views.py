@@ -212,7 +212,7 @@ class GetSpecificDayReservationsAPI(APIView):
 
     def post(self, request):
         # date = request.data['date']
-        reservations = Reservation.objects.all()
+        reservations = Reservation.objects.all().order_by('reservation_time')
         filter = ReserveFilter(request.data, reservations)
         # reservations = Reservation.objects.filter(reservation_time=date)
         # srz_data = ReserveSerializer(instance=filter.qs, many=True)
@@ -269,7 +269,8 @@ class Paginate(APIView):
                 "current": page_obj.number,
                 "has_next": page_obj.has_next(),
                 "has_previous": page_obj.has_previous(),
-                "total": paginator.num_pages
+                "total": paginator.num_pages,
+                "total_obj": page_obj.end_index()
 
             },
             "data": srz_data.data

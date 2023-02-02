@@ -37,7 +37,7 @@ class ContactUsSerializer(serializers.ModelSerializer):
 
 class BanCreateSerializer(serializers.ModelSerializer):
     end = JDateField(required=False)
-    ending = serializers.CharField(max_length=1)
+    ending = serializers.CharField(max_length=10)
 
     class Meta:
         model = Ban

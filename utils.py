@@ -2,6 +2,7 @@ from kavenegar import *
 import django_filters
 from django_filters import DateFilter, TimeFilter, CharFilter, NumberFilter
 from accounting.models import User
+from reserve.models import Reservation
 
 
 def send_otp_code(phone_number, code):
@@ -30,4 +31,5 @@ class UserFilter(django_filters.FilterSet):
 
 class ReserveFilter(django_filters.FilterSet):
     class Meta:
+        model = Reservation
         fields = '__all__'
