@@ -48,6 +48,8 @@ class GetFreeDesks(APIView):
         data = request.data
         full_days_single = list()
         full_days_group = list()
+        single_price = int()
+        group_price = int()
         for d in data:
             date = datetime.datetime.strptime(data[d], "%Y-%m-%d").date()
             reservations = Desk.objects.filter(reservation__reservation_time__year=date.year,
@@ -60,13 +62,24 @@ class GetFreeDesks(APIView):
                 full_days_single = data[d]
             if not free_desks_group:
                 full_days_group = data[d]
-
+        single_price = free_desks_single[0].price
+        group_price = free_desks_group[0].price
+        print('=hapen')
         if not full_days_single and not full_days_group:
-            return Response({'msg': True})
+            return Response({'msg': True,
+                             'single_price': single_price,
+                             'group_price': group_price,
+                             'off10': 3,
+                             'off20': 5})
         else:
             return Response({'msg': False,
                              'full_days_group': full_days_group,
-                             'full_days_single': full_days_single})
+                             'full_days_single': full_days_single,
+                             'single_price': single_price,
+                             'group_price': group_price,
+                             'off10': 3,
+                             'off20': 5
+                             })
 
 
 class ReserveDeskAPI(APIView):
@@ -133,10 +146,10 @@ class ReserveDeskAPI(APIView):
                 if free_desks:
                     if data[key] == 'group':
                         group_count += 1
-                        price += 50
+                        price += free_desks[0].price
                     elif data[key] == 'single':
                         single_count += 1
-                        price += 30
+                        price += free_desks[0].price
                 else:
                     reserved_desks[key] = data[key]
                     reserve_status = True

@@ -126,13 +126,17 @@ class PolicyAPI(APIView):
             return Response({'msg': 'information updated'})
 
 
-class CloseDayAPI(APIView):
+class GetCloseDayAPI(APIView):
     serializer_class = CloseDaySerializer
 
-    def get(self, request):
+    def post(self, request):
         days = CloseDays.objects.all()
         payload = Paginate.page(self, request, days, self.serializer_class)
         return Response(payload)
+
+
+class CreateCloseDay(APIView):
+    serializer_class = CloseDaySerializer
 
     def post(self, request):
         flag = bool()
@@ -219,7 +223,6 @@ class BanUserAPI(APIView):
     }
     """
     # permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = BanCreateSerializer
 
     def post(self, request):
         srz_data = self.serializer_class(data=request.data)
