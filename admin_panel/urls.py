@@ -40,7 +40,7 @@ urlpatterns = [
     path('reserve/', views.AdminReserveDeskAPI.as_view()),
     # path('admin-cancel-reserve/', views.AdminCancelReservationAPI.as_view()),
 
-    path('all-reservations/', views.GetAllReservesAPI.as_view()),
+    # path('all-reservations/', views.GetAllReservesAPI.as_view()),
     path('get-reservations-via-date/', views.GetTodayReservesAPI.as_view()),
     path('get-reservations/', GetSpecificDayReservationsAPI.as_view()),
 
