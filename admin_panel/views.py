@@ -156,9 +156,6 @@ class CreateCloseDay(APIView):
             return Response({'msg': 'some days are currently closed!'})
 
 
-
-
-
 class RemoveCloseDay(APIView):
     def post(self, request):
         ids = request.data['ids']
