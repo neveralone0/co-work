@@ -4,7 +4,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView, Response, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
-from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer, GetReserveSerializer
+from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer, \
+    GetReserveSerializer
 from accounting.permissions import IsNotBanned
 from finance.models import Income
 from utils import ReserveFilter
@@ -79,6 +80,7 @@ class ReserveDeskAPI(APIView):
     # serializer_class = ReserveSerializer
 
     def post(self, request, is_admin=False):
+        flag = bool()
         reserve_status = False
         reserved_desks = dict()
         price = int()
@@ -89,13 +91,12 @@ class ReserveDeskAPI(APIView):
         try:
             user = data['phone_number']
             del (data['phone_number'])
+            flag = True
         except:
-            pass
-        try:
-            user = User.objects.get(id=user)
-        except:
-            user = request.user.id
-            user = User.objects.get(id=user)
+            user = request.user.phone_number
+            flag = False
+
+        user = User.objects.get(phone_number=user)
 
         now = datetime.date.today()
         now = jalali_date.date2jalali(now).strftime('%Y-%m-%d')
@@ -171,7 +172,6 @@ class ReserveDeskAPI(APIView):
                 price=free_desks[0].price,
                 order_time=now
             )
-
 
             if is_admin:
                 payment = True
