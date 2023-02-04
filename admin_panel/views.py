@@ -33,13 +33,13 @@ class UploadImage(APIView):
         if srz_data.is_valid():
             srz_data.save()
             return Response({'msg': 'image uploaded'}, status=status.HTTP_201_CREATED)
-        return Response({srz_data.errors})
+        return Response(srz_data.errors)
 
 
 class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     queryset = Images.objects.all()
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    parser_clases = (JSONParser, MultiPartParser, FormParser)
     permission_classes = [AllowAny, ]
 
     def perform_create(self, serializer):

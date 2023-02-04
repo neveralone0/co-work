@@ -5,7 +5,8 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('image', views.MyModelViewSet, basename='imageee')
+router.register('image', views.MyModelViewSet, basename='image')
+router.register('image2', views.ImageViewSet, basename='imageee')
 
 app_name = 'admin'
 urlpatterns = [

@@ -3,14 +3,13 @@ from core.settings import BASE_DIR
 from accounting.models import User
 from django_jalali.db import models as jmodels
 
-
-
-def upload_to(instance, filename):
-    return '/site{filename}'.format(filename=filename)
+#
+# def upload_to(instance, filename):
+#     return '/site{filename}'.format(filename=filename)
 
 
 class Images(models.Model):
-    img = models.ImageField(upload_to=upload_to)
+    img = models.ImageField(upload_to='media/')
 
 
 class Cards(models.Model):

@@ -20,7 +20,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
     # creator = serializers.ReadOnlyField(source='creator.username')
     # creator_id = serializers.ReadOnlyField(source='creator.id')
-    img = serializers.ImageField()
+    # img = serializers.ImageField()
 
     class Meta:
         model = Images
