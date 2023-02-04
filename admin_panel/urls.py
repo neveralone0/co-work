@@ -5,14 +5,14 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('image', views.MyModelViewSet, basename='image')
-router.register('image2', views.ImageViewSet, basename='imageee')
+# router.register('image', views.MyModelViewSet, basename='image')
+router.register('image', views.ImageViewSet, basename='imageee')
 
 app_name = 'admin'
 urlpatterns = [
     path('', include(router.urls)),
-    path('get-all-images/', views.GetAllImage.as_view()),
-    path('upload-image/', views.UploadImage.as_view()),
+    # path('get-all-images/', views.GetAllImage.as_view()),
+    # path('upload-image/', views.UploadImage.as_view()),
     path('delete-image/', views.DeleteImage.as_view()),
     path('list-delete-image/', views.ListDeleteImages.as_view()),
 
