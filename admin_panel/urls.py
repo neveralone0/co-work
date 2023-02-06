@@ -55,6 +55,8 @@ urlpatterns = [
     path('update-quotes/', views.UpdateQuotes.as_view()),
 
     path('remove-user/', views.RemoveUserAPI.as_view()),
+
+    path('selected-images/', views.SelectedImages.as_view()),
 ]
 
 
