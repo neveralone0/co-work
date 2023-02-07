@@ -608,3 +608,67 @@ class RemoveUserAPI(APIView):
         user.is_active = False
         user.save()
         return Response({'message': 'user deleted successfully'}, status=status.HTTP_200_OK)
+
+
+class SelectedImages(APIView):
+    serializer_class = ChoosedImageSerializer
+
+    def get(self, request):
+        imgs = ChoosedImages.objects.all()
+        ls = list()
+        # place = list()
+        for i in imgs:
+            ls.append(i.choosed.id)
+            print('=id')
+            print(i.id)
+            # place.append(i.id)
+
+        # print(place)
+        # resp = dict()
+        # count = 0
+        # for i in ls:
+        #     img = Images.objects.get(id=i)
+        #     resp[count] = img
+        #     count += 1
+        imgs = Images.objects.filter(id__in=ls)
+        srz_data = ImageGetSerializer(imgs, many=True)
+        place = 1
+        count = 0
+        new = dict()
+        print(srz_data.data)
+        for i in srz_data.data:
+            print('*')
+            # print(srz_data.data[count])
+            new[place] = srz_data.data[count]['img']
+
+            # print(srz_data.data[count])
+            count+=1
+            place+=1
+        print(new)
+        # return Response(new)
+        return Response(srz_data.data)
+
+    def post(self, request):
+        # img1 = request.data['img1']
+        # img2 = request.data['img2']
+        # img3 = request.data['img3']
+        # img4 = request.data['img4']
+        #
+        # obj1 = Images.objects.filter(id=img1)
+        # if obj1:
+        #     obj1[0].choosed = 0
+        #     obj1.save()
+        # new_obj1 = Images.objects.filter(id=img1)
+        # new_obj1[0].choosed = 1
+        #
+        for item in request.data:
+            try:
+                obj = ChoosedImages.objects.get(id=item)
+                img = Images.objects.get(id=request.data[item])
+                obj.choosed = img
+                obj.save()
+            except:
+                ChoosedImages.objects.create(
+                    choosed=Images.objects.get(id=request.data[item])
+                )
+        return Response({'msg': 'choosed images updated'})

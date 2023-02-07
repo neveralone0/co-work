@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Cards, Images, ContactUs, Ban, Quotes, Policy, CloseDays
+from .models import Cards, Images, ContactUs, Ban, Quotes, Policy, CloseDays, ChoosedImages
 from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 
 
@@ -17,13 +17,20 @@ class CardSerializer(serializers.ModelSerializer):
 #         fields = '__all__'
 
 class ImageSerializer(serializers.ModelSerializer):
-
-    # creator = serializers.ReadOnlyField(source='creator.username')
-    # creator_id = serializers.ReadOnlyField(source='creator.id')
-    # img = serializers.ImageField()
-
     class Meta:
         model = Images
+        fields = ('img', )
+
+
+class ImageGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Images
+        fields = ('img', 'id')
+
+
+class ChoosedImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChoosedImages
         fields = '__all__'
 
 

@@ -11,6 +11,19 @@ from django_jalali.db import models as jmodels
 class Images(models.Model):
     img = models.ImageField(upload_to='media/')
 
+    def __str__(self):
+        return f'{self.id}'
+
+
+class ChoosedImages(models.Model):
+    choosed = models.ForeignKey(to=Images, on_delete=models.SET_DEFAULT, default='media/default',
+                                related_name='images')
+
+    def __str__(self):
+        return f'id :{self.id} choosed: {self.choosed}'
+
+
+
 
 class Cards(models.Model):
     title = models.CharField(max_length=64)
