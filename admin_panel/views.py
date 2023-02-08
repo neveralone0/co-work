@@ -623,7 +623,7 @@ class SelectedImages(APIView):
         d = dict()
         count = 1
         for i in imgs:
-            path = str(BASE_URL) + str(i.img)
+            path = str(BASE_URL) + str(i.img) + 'media/'
             d[count] = {'url': path, 'id': i.id}
             count += 1
         return Response(d)
