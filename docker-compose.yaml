@@ -23,4 +23,17 @@ web:
   build:
     context: '.'
     dockerfile: ".DockerFile"
-    
+
+  volumes:
+    . .:/app
+  ports:
+    . "8000:8000"
+  depends_on:
+    . redis_cache
+    . postgres_db
+  command: bash -c "python3 mange.py migrate"
+
+
+
+volumes:
+  pgdata:
