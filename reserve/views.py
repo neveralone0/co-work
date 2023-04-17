@@ -5,11 +5,23 @@ from rest_framework.views import APIView, Response, status
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from .models import Desk, Reservation, User
 from .serializers import DeskSerializer, ReserveSerializer, FreeDeskSerializer, MyReserveSerializer, \
-    GetReserveSerializer
+    UserVerifySerializer, GetReserveSerializer, UserLoginSerializer
 from accounting.permissions import IsNotBanned
 from finance.models import Income
 from utils import ReserveFilter
 import jalali_date
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+from random import randint
+from redis import Redis
+from datetime import datetime
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
+from django.contrib.auth.models import User
 
 
 class GetReservedDesks(APIView):
@@ -289,3 +301,43 @@ class Paginate(APIView):
             "data": srz_data.data
         }
         return payload
+
+
+red_con = Redis(host="localhost", port=6379, db=0, decode_responses=True, charset='UTF-8')
+verification_otp = str(randint(100000, 999999))
+
+
+class LoginView(APIView):
+    ser_data_phone = UserLoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.ser_data_phone(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        mobile = serializer.validated_data.get("mobile")
+        red_con.set(mobile, verification_otp, ex=120)
+        # send_code.apply_async(args=[mobile, verification_otp])
+        return Response(f"{verification_otp}", status=status.HTTP_200_OK)
+
+
+class VerifyView(APIView):
+    ser_data_phone = UserVerifySerializer
+
+    def post(self, request, *args, **kwargs):
+        ser_data = self.ser_data_phone(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        mobile = ser_data.validated_data.get("mobile")
+        get_user_code = ser_data.validated_data.get("otp")
+        stored_code = red_con.get(mobile)
+        if not stored_code == get_user_code:
+            return Response({"massage": "try again :/"}, status=status.HTTP_401_UNAUTHORIZED)
+        red_con.delete(mobile)
+        user, created = User.objects.get_or_create(username=mobile)
+        refresh_token = RefreshToken().for_user(user)
+        access_token = refresh_token.access_token
+        return Response(
+            data=
+            {
+                'access_token': str(access_token),
+                'refresh_token': str(refresh_token)
+            }, status=status.HTTP_200_OK
+        )
