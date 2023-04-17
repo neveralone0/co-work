@@ -14,3 +14,5 @@ RUN apt-get install -y gettext tzdata
 RUN python -m pip install -r requirements.txt
 
 COPY . .
+
+ENTRYPOINT ["python","manage.py","runserver"]
