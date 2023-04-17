@@ -82,9 +82,9 @@ class UserVerifySerializer(serializers.Serializer):
 
     def otp_validation(self, otp):
         if len(otp) != 6:
-            raise serializers.ValidationError("Please enter a correct password")
+            raise serializers.ValidationError("Please enter a correct code")
         elif not str(otp).isnumeric():
-            raise serializers.ValidationError("Please enter a correct password")
+            raise serializers.ValidationError("Please enter a correct code")
         return otp
 
 
