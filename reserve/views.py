@@ -307,6 +307,8 @@ red_con = Redis(host="localhost", port=6379, db=0, decode_responses=True, charse
 verification_otp = str(randint(100000, 999999))
 
 
+
+
 class LoginView(APIView):
     ser_data_phone = UserLoginSerializer
 
@@ -338,6 +340,6 @@ class VerifyView(APIView):
             data=
             {
                 'access_token': str(access_token),
-                'refresh_token': str(refresh_token)
+                'refresh_token': str(refresh_token),
             }, status=status.HTTP_200_OK
         )
