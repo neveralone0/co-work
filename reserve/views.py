@@ -303,20 +303,20 @@ class Paginate(APIView):
         return payload
 
 
-red_con = Redis(host="localhost", port=6379, db=0, decode_responses=True, charset='UTF-8')
+redis_connection = Redis(host="localhost", port=6379, db=0, decode_responses=True, charset='UTF-8')
 verification_otp = str(randint(100000, 999999))
 
 
 
 
 class LoginView(APIView):
-    ser_data_phone = UserLoginSerializer
+    serilizer_data_phone = UserLoginSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.ser_data_phone(data=request.data)
+        serializer = self.serilizer_data_phone(data=request.data)
         serializer.is_valid(raise_exception=True)
         mobile = serializer.validated_data.get("mobile")
-        red_con.set(mobile, verification_otp, ex=120)
+        redis_connection.set(mobile, verification_otp, ex=120)
         # send_code.apply_async(args=[mobile, verification_otp])
         return Response(f"{verification_otp}", status=status.HTTP_200_OK)
 
@@ -329,10 +329,10 @@ class VerifyView(APIView):
         ser_data.is_valid(raise_exception=True)
         mobile = ser_data.validated_data.get("mobile")
         get_user_code = ser_data.validated_data.get("otp")
-        stored_code = red_con.get(mobile)
+        stored_code = redis_connection.get(mobile)
         if not stored_code == get_user_code:
             return Response({"massage": "try again :/"}, status=status.HTTP_401_UNAUTHORIZED)
-        red_con.delete(mobile)
+        redis_connection.delete(mobile)
         user, created = User.objects.get_or_create(username=mobile)
         refresh_token = RefreshToken().for_user(user)
         access_token = refresh_token.access_token
